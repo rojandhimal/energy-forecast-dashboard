@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Grid Energy Forecast — Demand Prediction System</title>
+  <style>
+    :root {
+      --bg:      oklch(98% 0.005 250);
+      --surface: oklch(100% 0 0);
+      --fg:      oklch(22% 0.02 240);
+      --muted:   oklch(50% 0.018 240);
+      --border:  oklch(90% 0.008 240);
+      --accent:  oklch(58% 0.16 145);
+      --accent-soft: oklch(95% 0.04 145);
+
+      --success: oklch(62% 0.17 145);
+      --warn:    oklch(75% 0.15 85);
+      --danger:  oklch(62% 0.2 25);
+
+      --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--fg);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .app {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg {
+      width: 18px;
+      height: 18px;
+      color: white;
+    }
+
+    .logo-text {
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+
+    .logo-text span {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .nav {
+      padding: 12px 8px;
+      flex: 1;
+    }
+
+    .nav-section {
+      margin-bottom: 20px;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 8px;
+      margin-bottom: 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      color: var(--fg);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .nav-item:hover {
+      background: var(--bg);
+    }
+
+    .nav-item.active {
+      background: var(--accent-soft);
+      color: oklch(40% 0.12 145);
+    }
+
+    .nav-item svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.7;
+    }
+
+    .nav-item.active svg {
+      opacity: 1;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .status-dot.warning { background: var(--warn); }
+    .status-dot.error { background: var(--danger); }
+
+    /* Main Content */
+    .main {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--accent-soft);
+      color: oklch(40% 0.12 145);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .header-badge svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .time-range {
+      display: flex;
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 2px;
+    }
+
+    .time-btn {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+
+    .time-btn:hover {
+      color: var(--fg);
+    }
+
+    .time-btn.active {
+      background: var(--surface);
+      color: var(--fg);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn:hover {
+      border-color: var(--muted);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: oklch(52% 0.16 145);
+      border-color: oklch(52% 0.16 145);
+    }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Content Grid */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-metrics {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .grid-main {
+      grid-template-columns: 2fr 1fr;
+    }
+
+    .grid-bottom {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .card-action {
+      font-size: 12px;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .card-action:hover {
+      text-decoration: underline;
+    }
+
+    .card-body {
+      padding: 16px;
+    }
+
+    /* Metric Cards */
+    .metric-card {
+      padding: 16px;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .metric-label svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .metric-value {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .metric-unit {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    .metric-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 8px;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .metric-change.up {
+      background: oklch(95% 0.04 145);
+      color: oklch(45% 0.14 145);
+    }
+
+    .metric-change.down {
+      background: oklch(95% 0.05 25);
+      color: oklch(50% 0.16 25);
+    }
+
+    .metric-change svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* Chart */
+    .chart-container {
+      position: relative;
+      height: 280px;
+      padding: 8px 0;
+    }
+
+    .chart-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 20px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .legend-dot.actual { background: var(--fg); }
+    .legend-dot.lstm { background: var(--accent); }
+    .legend-dot.arima { background: oklch(65% 0.15 250); }
+    .legend-dot.confidence { background: oklch(90% 0.04 145); }
+
+    /* Model Comparison */
+    .model-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .model-item {
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: 6px;
+    }
+
+    .model-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .model-name span {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .model-bar {
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .model-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .model-bar-fill.best { background: var(--accent); }
+    .model-bar-fill.good { background: oklch(65% 0.15 250); }
+    .model-bar-fill.fair { background: var(--warn); }
+
+    .model-metrics {
+      display: flex;
+      gap: 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .model-metric {
+      text-align: right;
+    }
+
+    .model-metric-label {
+      font-family: var(--font-body);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .model-metric-value {
+      font-weight: 600;
+    }
+
+    .best-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      background: var(--accent-soft);
+      color: oklch(40% 0.12 145);
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-left: 8px;
+    }
+
+    /* Feature Importance (XAI) */
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature-item {
+      display: grid;
+      grid-template-columns: 120px 1fr 50px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .feature-name {
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .feature-bar {
+      height: 20px;
+      background: var(--bg);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .feature-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+    }
+
+    .feature-value {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    /* Weather Impact */
+    .weather-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .weather-item {
+      text-align: center;
+      padding: 14px 12px;
+      background: var(--bg);
+      border-radius: 6px;
+    }
+
+    .weather-icon {
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 8px;
+      color: var(--muted);
+    }
+
+    .weather-value {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .weather-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .weather-impact {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      margin-top: 6px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: oklch(95% 0.04 145);
+      color: oklch(45% 0.14 145);
+    }
+
+    .weather-impact.negative {
+      background: oklch(95% 0.05 25);
+      color: oklch(50% 0.16 25);
+    }
+
+    /* Alerts */
+    .alert-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .alert-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      border-left: 3px solid transparent;
+    }
+
+    .alert-item.warning {
+      border-left-color: var(--warn);
+    }
+
+    .alert-item.info {
+      border-left-color: oklch(65% 0.15 250);
+    }
+
+    .alert-item.success {
+      border-left-color: var(--success);
+    }
+
+    .alert-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .alert-item.warning .alert-icon { color: var(--warn); }
+    .alert-item.info .alert-icon { color: oklch(65% 0.15 250); }
+    .alert-item.success .alert-icon { color: var(--success); }
+
+    .alert-content {
+      flex: 1;
+    }
+
+    .alert-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .alert-desc {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .alert-time {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .grid-metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .grid-main {
+        grid-template-columns: 1fr;
+      }
+      .grid-bottom {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .grid-metrics {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" data-od-id="app-shell">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" data-od-id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+          </div>
+          <div class="logo-text">GridSense <span>AI</span></div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <div class="nav-section">
+          <div class="nav-label">Overview</div>
+          <a class="nav-item active" data-od-id="nav-dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="9" rx="1"/>
+              <rect x="14" y="3" width="7" height="5" rx="1"/>
+              <rect x="14" y="12" width="7" height="9" rx="1"/>
+              <rect x="3" y="16" width="7" height="5" rx="1"/>
+            </svg>
+            Dashboard
+          </a>
+          <a class="nav-item" data-od-id="nav-forecasts">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 3v18h18"/>
+              <path d="M18 9l-5 5-4-4-4 4"/>
+            </svg>
+            Forecasts
+          </a>
+          <a class="nav-item" data-od-id="nav-historical">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Historical Data
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">Analysis</div>
+          <a class="nav-item" data-od-id="nav-models">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+            Model Comparison
+          </a>
+          <a class="nav-item" data-od-id="nav-xai">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            Explainable AI
+          </a>
+          <a class="nav-item" data-od-id="nav-weather">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 18a5 5 0 0 0-10 0"/>
+              <line x1="12" y1="9" x2="12" y2="2"/>
+              <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/>
+              <line x1="1" y1="18" x2="3" y2="18"/>
+              <line x1="21" y1="18" x2="23" y2="18"/>
+              <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>
+            </svg>
+            Weather Impact
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">Settings</div>
+          <a class="nav-item" data-od-id="nav-data">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+            </svg>
+            Data Sources
+          </a>
+          <a class="nav-item" data-od-id="nav-config">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            Configuration
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status">
+          <span class="status-dot"></span>
+          <span>All systems operational</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main" data-od-id="main-content">
+      <header class="header" data-od-id="header">
+        <div class="header-left">
+          <h1 class="header-title">Energy Demand Forecast</h1>
+          <span class="header-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            LSTM Model Active
+          </span>
+        </div>
+        <div class="header-right">
+          <div class="time-range" data-od-id="time-range">
+            <button class="time-btn">24H</button>
+            <button class="time-btn active">7D</button>
+            <button class="time-btn">30D</button>
+            <button class="time-btn">90D</button>
+          </div>
+          <button class="btn" data-od-id="btn-export">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export
+          </button>
+          <button class="btn btn-primary" data-od-id="btn-run-forecast">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Run Forecast
+          </button>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- Key Metrics -->
+        <div class="grid grid-metrics" style="margin-bottom: 16px;" data-od-id="metrics-row">
+          <div class="card metric-card" data-od-id="metric-predicted">
+            <div class="metric-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+              Predicted Peak Demand
+            </div>
+            <div class="metric-value">4,872<span class="metric-unit">MW</span></div>
+            <div class="metric-change up">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              </svg>
+              +3.2% from last week
+            </div>
+          </div>
+
+          <div class="card metric-card" data-od-id="metric-current">
+            <div class="metric-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              Current Load
+            </div>
+            <div class="metric-value">3,641<span class="metric-unit">MW</span></div>
+            <div class="metric-change down">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+              </svg>
+              -1.8% from yesterday
+            </div>
+          </div>
+
+          <div class="card metric-card" data-od-id="metric-accuracy">
+            <div class="metric-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              Model Accuracy (MAPE)
+            </div>
+            <div class="metric-value">96.4<span class="metric-unit">%</span></div>
+            <div class="metric-change up">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              </svg>
+              +0.8% improvement
+            </div>
+          </div>
+
+          <div class="card metric-card" data-od-id="metric-renewable">
+            <div class="metric-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/>
+                <line x1="21" y1="12" x2="23" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+              </svg>
+              Renewable Share
+            </div>
+            <div class="metric-value">34.7<span class="metric-unit">%</span></div>
+            <div class="metric-change up">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              </svg>
+              +5.1% from last month
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Chart & Model Comparison -->
+        <div class="grid grid-main" style="margin-bottom: 16px;" data-od-id="main-row">
+          <div class="card" data-od-id="forecast-chart">
+            <div class="card-header">
+              <span class="card-title">7-Day Demand Forecast</span>
+              <a class="card-action">View full analysis</a>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <svg class="chart-svg" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid meet">
+                  <!-- Grid lines -->
+                  <g stroke="oklch(92% 0.005 240)" stroke-width="1">
+                    <line x1="50" y1="20" x2="580" y2="20"/>
+                    <line x1="50" y1="65" x2="580" y2="65"/>
+                    <line x1="50" y1="110" x2="580" y2="110"/>
+                    <line x1="50" y1="155" x2="580" y2="155"/>
+                    <line x1="50" y1="200" x2="580" y2="200"/>
+                  </g>
+
+                  <!-- Y-axis labels -->
+                  <g fill="oklch(50% 0.018 240)" font-family="var(--font-mono)" font-size="10">
+                    <text x="45" y="24" text-anchor="end">5000</text>
+                    <text x="45" y="69" text-anchor="end">4500</text>
+                    <text x="45" y="114" text-anchor="end">4000</text>
+                    <text x="45" y="159" text-anchor="end">3500</text>
+                    <text x="45" y="204" text-anchor="end">3000</text>
+                  </g>
+
+                  <!-- X-axis labels -->
+                  <g fill="oklch(50% 0.018 240)" font-family="var(--font-body)" font-size="10">
+                    <text x="90" y="220" text-anchor="middle">Mon</text>
+                    <text x="166" y="220" text-anchor="middle">Tue</text>
+                    <text x="242" y="220" text-anchor="middle">Wed</text>
+                    <text x="318" y="220" text-anchor="middle">Thu</text>
+                    <text x="394" y="220" text-anchor="middle">Fri</text>
+                    <text x="470" y="220" text-anchor="middle">Sat</text>
+                    <text x="546" y="220" text-anchor="middle">Sun</text>
+                  </g>
+
+                  <!-- Confidence interval (LSTM prediction range) -->
+                  <path d="M90 85 L166 95 L242 80 L318 70 L394 60 L470 75 L546 65
+                           L546 105 L470 115 L394 100 L318 110 L242 120 L166 135 L90 125 Z"
+                        fill="oklch(90% 0.04 145)" opacity="0.5"/>
+
+                  <!-- Actual demand (historical) -->
+                  <path d="M90 105 L166 115 L242 95 L318 88"
+                        fill="none" stroke="oklch(22% 0.02 240)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="90" cy="105" r="4" fill="oklch(22% 0.02 240)"/>
+                  <circle cx="166" cy="115" r="4" fill="oklch(22% 0.02 240)"/>
+                  <circle cx="242" cy="95" r="4" fill="oklch(22% 0.02 240)"/>
+                  <circle cx="318" cy="88" r="4" fill="oklch(22% 0.02 240)"/>
+
+                  <!-- LSTM prediction -->
+                  <path d="M318 88 L394 78 L470 92 L546 82"
+                        fill="none" stroke="oklch(58% 0.16 145)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="8 4"/>
+                  <circle cx="394" cy="78" r="4" fill="oklch(58% 0.16 145)"/>
+                  <circle cx="470" cy="92" r="4" fill="oklch(58% 0.16 145)"/>
+                  <circle cx="546" cy="82" r="4" fill="oklch(58% 0.16 145)"/>
+
+                  <!-- ARIMA prediction (secondary) -->
+                  <path d="M318 88 L394 85 L470 98 L546 90"
+                        fill="none" stroke="oklch(65% 0.15 250)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 4" opacity="0.7"/>
+
+                  <!-- Today marker -->
+                  <line x1="318" y1="20" x2="318" y2="200" stroke="oklch(58% 0.16 145)" stroke-width="1" stroke-dasharray="4 2"/>
+                  <text x="318" y="12" fill="oklch(58% 0.16 145)" font-size="9" text-anchor="middle" font-weight="600">TODAY</text>
+                </svg>
+              </div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item"><span class="legend-dot actual"></span> Actual Demand</div>
+              <div class="legend-item"><span class="legend-dot lstm"></span> LSTM Forecast</div>
+              <div class="legend-item"><span class="legend-dot arima"></span> ARIMA Forecast</div>
+              <div class="legend-item"><span class="legend-dot confidence"></span> 95% Confidence</div>
+            </div>
+          </div>
+
+          <div class="card" data-od-id="model-comparison">
+            <div class="card-header">
+              <span class="card-title">Model Performance</span>
+              <a class="card-action">Details</a>
+            </div>
+            <div class="card-body">
+              <div class="model-list">
+                <div class="model-item">
+                  <div class="model-name">
+                    LSTM
+                    <span>Deep Learning</span>
+                    <span class="best-badge">Best</span>
+                  </div>
+                  <div class="model-bar">
+                    <div class="model-bar-fill best" style="width: 96.4%"></div>
+                  </div>
+                  <div class="model-metrics">
+                    <div class="model-metric">
+                      <div class="model-metric-label">MAE</div>
+                      <div class="model-metric-value">142</div>
+                    </div>
+                    <div class="model-metric">
+                      <div class="model-metric-label">RMSE</div>
+                      <div class="model-metric-value">186</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="model-item">
+                  <div class="model-name">
+                    Random Forest
+                    <span>Machine Learning</span>
+                  </div>
+                  <div class="model-bar">
+                    <div class="model-bar-fill good" style="width: 92.1%"></div>
+                  </div>
+                  <div class="model-metrics">
+                    <div class="model-metric">
+                      <div class="model-metric-label">MAE</div>
+                      <div class="model-metric-value">198</div>
+                    </div>
+                    <div class="model-metric">
+                      <div class="model-metric-label">RMSE</div>
+                      <div class="model-metric-value">245</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="model-item">
+                  <div class="model-name">
+                    SARIMA
+                    <span>Statistical</span>
+                  </div>
+                  <div class="model-bar">
+                    <div class="model-bar-fill good" style="width: 89.3%"></div>
+                  </div>
+                  <div class="model-metrics">
+                    <div class="model-metric">
+                      <div class="model-metric-label">MAE</div>
+                      <div class="model-metric-value">234</div>
+                    </div>
+                    <div class="model-metric">
+                      <div class="model-metric-label">RMSE</div>
+                      <div class="model-metric-value">289</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="model-item">
+                  <div class="model-name">
+                    ARIMA
+                    <span>Statistical</span>
+                  </div>
+                  <div class="model-bar">
+                    <div class="model-bar-fill fair" style="width: 85.7%"></div>
+                  </div>
+                  <div class="model-metrics">
+                    <div class="model-metric">
+                      <div class="model-metric-label">MAE</div>
+                      <div class="model-metric-value">278</div>
+                    </div>
+                    <div class="model-metric">
+                      <div class="model-metric-label">RMSE</div>
+                      <div class="model-metric-value">342</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Row: XAI, Weather, Alerts -->
+        <div class="grid grid-bottom" data-od-id="bottom-row">
+          <div class="card" data-od-id="xai-panel">
+            <div class="card-header">
+              <span class="card-title">Explainable AI — Feature Importance</span>
+              <a class="card-action">Full report</a>
+            </div>
+            <div class="card-body">
+              <div class="feature-list">
+                <div class="feature-item">
+                  <span class="feature-name">Temperature</span>
+                  <div class="feature-bar">
+                    <div class="feature-bar-fill" style="width: 92%"></div>
+                  </div>
+                  <span class="feature-value">0.92</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-name">Hour of Day</span>
+                  <div class="feature-bar">
+                    <div class="feature-bar-fill" style="width: 84%"></div>
+                  </div>
+                  <span class="feature-value">0.84</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-name">Day of Week</span>
+                  <div class="feature-bar">
+                    <div class="feature-bar-fill" style="width: 71%"></div>
+                  </div>
+                  <span class="feature-value">0.71</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-name">Solar Radiation</span>
+                  <div class="feature-bar">
+                    <div class="feature-bar-fill" style="width: 65%"></div>
+                  </div>
+                  <span class="feature-value">0.65</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-name">Wind Speed</span>
+                  <div class="feature-bar">
+                    <div class="feature-bar-fill" style="width: 48%"></div>
+                  </div>
+                  <span class="feature-value">0.48</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-name">Humidity</span>
+                  <div class="feature-bar">
+                    <div class="feature-bar-fill" style="width: 35%"></div>
+                  </div>
+                  <span class="feature-value">0.35</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-od-id="weather-panel">
+            <div class="card-header">
+              <span class="card-title">Weather Impact Analysis</span>
+              <a class="card-action">7-day outlook</a>
+            </div>
+            <div class="card-body">
+              <div class="weather-grid">
+                <div class="weather-item">
+                  <svg class="weather-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                  </svg>
+                  <div class="weather-value">32°C</div>
+                  <div class="weather-label">Temperature</div>
+                  <div class="weather-impact negative">+8.2% demand</div>
+                </div>
+                <div class="weather-item">
+                  <svg class="weather-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+                  </svg>
+                  <div class="weather-value">18 km/h</div>
+                  <div class="weather-label">Wind Speed</div>
+                  <div class="weather-impact">+4.1% wind gen</div>
+                </div>
+                <div class="weather-item">
+                  <svg class="weather-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+                  </svg>
+                  <div class="weather-value">15%</div>
+                  <div class="weather-label">Cloud Cover</div>
+                  <div class="weather-impact">+12% solar gen</div>
+                </div>
+                <div class="weather-item">
+                  <svg class="weather-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <line x1="12" y1="20" x2="12" y2="10"/>
+                    <line x1="18" y1="20" x2="18" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="16"/>
+                  </svg>
+                  <div class="weather-value">65%</div>
+                  <div class="weather-label">Humidity</div>
+                  <div class="weather-impact negative">+2.4% demand</div>
+                </div>
+                <div class="weather-item">
+                  <svg class="weather-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                  </svg>
+                  <div class="weather-value">$68</div>
+                  <div class="weather-label">Spot Price</div>
+                  <div class="weather-impact">-3.1% vs avg</div>
+                </div>
+                <div class="weather-item">
+                  <svg class="weather-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  <div class="weather-value">Weekday</div>
+                  <div class="weather-label">Day Type</div>
+                  <div class="weather-impact negative">+15% baseline</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-od-id="alerts-panel">
+            <div class="card-header">
+              <span class="card-title">Operational Alerts</span>
+              <a class="card-action">View all</a>
+            </div>
+            <div class="card-body">
+              <div class="alert-list">
+                <div class="alert-item warning">
+                  <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                  <div class="alert-content">
+                    <div class="alert-title">Peak Demand Warning</div>
+                    <div class="alert-desc">Expected peak of 4,872 MW on Friday 14:00-16:00. Consider load shifting.</div>
+                  </div>
+                  <span class="alert-time">2h ago</span>
+                </div>
+
+                <div class="alert-item info">
+                  <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                  </svg>
+                  <div class="alert-content">
+                    <div class="alert-title">Model Retrained</div>
+                    <div class="alert-desc">LSTM model updated with latest 30-day data. Accuracy improved 0.8%.</div>
+                  </div>
+                  <span class="alert-time">5h ago</span>
+                </div>
+
+                <div class="alert-item success">
+                  <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                  <div class="alert-content">
+                    <div class="alert-title">Renewable Integration</div>
+                    <div class="alert-desc">Solar generation exceeded forecast by 12%. Grid stability maintained.</div>
+                  </div>
+                  <span class="alert-time">1d ago</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Time range selector interaction
+    document.querySelectorAll('.time-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Nav item interaction
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
