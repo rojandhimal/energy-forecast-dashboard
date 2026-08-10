@@ -40,26 +40,60 @@ This project implements an Energy Demand Forecasting Dashboard that helps electr
 
 ## Tech Stack
 
-- HTML5 / CSS3
-- JavaScript (Vanilla)
-- SVG Charts
-- Responsive Design
+- **React 18** with Vite
+- **Component Architecture** — Modular, reusable components
+- **CSS Custom Properties** — Theming with design tokens
+- **SVG Charts** — Native SVG for data visualization
+- **Responsive Design** — Desktop, tablet, mobile
 
 ## Project Structure
 
 ```
 .
-├── energy-forecast-dashboard.html   # Main dashboard interface
-├── README.md                        # Project documentation
-├── CHANGELOG.md                     # Version history
-└── Assignment-1-MDA692.docx         # Project specification
+├── src/
+│   ├── components/
+│   │   ├── ui/              # Reusable UI components
+│   │   │   ├── Card.jsx
+│   │   │   ├── Button.jsx
+│   │   │   ├── MetricCard.jsx
+│   │   │   └── Icons.jsx
+│   │   ├── layout/          # Layout components
+│   │   │   ├── Sidebar.jsx
+│   │   │   └── Header.jsx
+│   │   └── dashboard/       # Dashboard panels
+│   │       ├── ForecastChart.jsx
+│   │       ├── ModelComparison.jsx
+│   │       ├── FeatureImportance.jsx
+│   │       ├── WeatherImpact.jsx
+│   │       └── Alerts.jsx
+│   ├── styles/
+│   │   └── index.css        # Global styles & tokens
+│   ├── App.jsx              # Main app component
+│   └── main.jsx             # Entry point
+├── energy-forecast-dashboard.html   # Static HTML version
+├── package.json
+├── vite.config.js
+└── README.md
 ```
 
 ## Getting Started
 
-1. Clone the repository
-2. Open `energy-forecast-dashboard.html` in a browser
-3. No build step required — static HTML
+### React Version (Recommended)
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+### Static HTML Version
+
+Open `energy-forecast-dashboard.html` directly in a browser — no build required.
 
 ## Team
 

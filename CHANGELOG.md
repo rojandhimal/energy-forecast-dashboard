@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.0.0] - 2026-08-10
+
+### Changed
+
+- **Full React Conversion** — Migrated from vanilla HTML/JS to React 18 + Vite
+- Component-based architecture with modular, reusable components
+- Separated concerns: UI components, layout components, dashboard panels
+
+### Added
+
+- **React Components**:
+  - `ui/` — Card, Button, MetricCard, Icons (reusable primitives)
+  - `layout/` — Sidebar, Header (app shell)
+  - `dashboard/` — ForecastChart, ModelComparison, FeatureImportance, WeatherImpact, Alerts
+- State management with React hooks (`useState`)
+- Vite build system for fast development and optimized production builds
+- Hot Module Replacement (HMR) for instant dev feedback
+- Component-scoped CSS files
+
+### Technical
+
+- React 18.3.1 with StrictMode
+- Vite 5.4.2 build tooling
+- CSS modules pattern (component.css per component)
+- Preserved all original functionality and design tokens
+
+---
+
 ## [1.0.0] - 2026-08-10
 
 ### Added

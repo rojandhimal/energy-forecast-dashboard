@@ -11,3 +11,21 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Build output
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Open Design
+.file-versions/
+.od-skills/
+*.artifact.json
