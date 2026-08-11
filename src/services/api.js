@@ -51,29 +51,40 @@ async function apiFetch(endpoint) {
   return response.json()
 }
 
+// Helper to get data by time range
+function getByTimeRange(data, timeRange = '7D') {
+  // If data has time range keys, return the matching one
+  if (data[timeRange]) {
+    return data[timeRange]
+  }
+  // Otherwise return as-is (for non-time-filtered data)
+  return data
+}
+
 // API Functions - these can be called from components
 
-export async function getMetrics() {
+export async function getMetrics(timeRange = '7D') {
   if (config.useApi) {
-    return apiFetch('/metrics')
+    return apiFetch(`/metrics?range=${timeRange}`)
   }
-  return simulateDelay(metricsJson)
+  return simulateDelay(getByTimeRange(metricsJson, timeRange))
 }
 
-export async function getForecasts() {
+export async function getForecasts(timeRange = '7D') {
   if (config.useApi) {
-    return apiFetch('/forecasts')
+    return apiFetch(`/forecasts?range=${timeRange}`)
   }
-  return simulateDelay(forecastsJson)
+  const data = getByTimeRange(forecastsJson, timeRange)
+  return simulateDelay(data)
 }
 
-export async function getForecastSummary() {
-  const data = await getForecasts()
+export async function getForecastSummary(timeRange = '7D') {
+  const data = await getForecasts(timeRange)
   return data.summary
 }
 
-export async function getForecastChart() {
-  const data = await getForecasts()
+export async function getForecastChart(timeRange = '7D') {
+  const data = await getForecasts(timeRange)
   return data.chartData
 }
 
@@ -155,10 +166,21 @@ export async function getAlerts() {
 }
 
 // Sync versions for components that don't need async
-// These directly return the imported JSON data
+// These directly return the imported JSON data with time range support
 
-export const metrics = metricsJson
-export const forecasts = forecastsJson
+export function getMetricsSync(timeRange = '7D') {
+  return getByTimeRange(metricsJson, timeRange)
+}
+
+export function getForecastsSync(timeRange = '7D') {
+  return getByTimeRange(forecastsJson, timeRange)
+}
+
+export function getMethodology() {
+  return forecastsJson.methodology
+}
+
+// Static data exports (not time-filtered)
 export const models = modelsJson
 export const historical = historicalJson
 export const features = featuresJson

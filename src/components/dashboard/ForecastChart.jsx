@@ -1,10 +1,58 @@
 import { Card, CardHeader, CardBody } from '../ui/Card'
+import { useTimeRange } from '../../context'
+import { getForecastsSync } from '../../services/api'
 import './ForecastChart.css'
 
+const chartConfigs = {
+  '24H': {
+    title: '24-Hour Demand Forecast',
+    labels: ['Now', '+6H', '+12H', '+18H', '+24H'],
+    xPositions: [90, 166, 242, 318, 394],
+    todayPosition: 90,
+    todayLabel: 'NOW'
+  },
+  '7D': {
+    title: '7-Day Demand Forecast',
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    xPositions: [90, 166, 242, 318, 394, 470, 546],
+    todayPosition: 318,
+    todayLabel: 'TODAY'
+  },
+  '30D': {
+    title: '30-Day Demand Forecast',
+    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+    xPositions: [90, 242, 394, 546],
+    todayPosition: 90,
+    todayLabel: 'CURRENT'
+  },
+  '90D': {
+    title: '90-Day Demand Forecast',
+    labels: ['Month 1', 'Month 2', 'Month 3'],
+    xPositions: [90, 318, 546],
+    todayPosition: 90,
+    todayLabel: 'CURRENT'
+  }
+}
+
 export function ForecastChart() {
+  const { timeRange } = useTimeRange()
+  const config = chartConfigs[timeRange]
+  const forecasts = getForecastsSync(timeRange)
+  const chartData = forecasts.chartData
+
+  // Generate path for actual data points
+  const actualPath = chartData.actual
+    .map((point, i) => `${i === 0 ? 'M' : 'L'}${point.x} ${point.y}`)
+    .join(' ')
+
+  // Generate path for LSTM predictions
+  const lstmPath = chartData.lstm
+    .map((point, i) => `${i === 0 ? 'M' : 'L'}${point.x} ${point.y}`)
+    .join(' ')
+
   return (
     <Card>
-      <CardHeader title="7-Day Demand Forecast" action="View full analysis" />
+      <CardHeader title={config.title} action="View full analysis" />
       <CardBody>
         <div className="chart-container">
           <svg className="chart-svg" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid meet">
@@ -26,15 +74,13 @@ export function ForecastChart() {
               <text x="45" y="204" textAnchor="end">3000</text>
             </g>
 
-            {/* X-axis labels */}
+            {/* X-axis labels - dynamic based on time range */}
             <g fill="oklch(50% 0.018 240)" fontFamily="var(--font-body)" fontSize="10">
-              <text x="90" y="220" textAnchor="middle">Mon</text>
-              <text x="166" y="220" textAnchor="middle">Tue</text>
-              <text x="242" y="220" textAnchor="middle">Wed</text>
-              <text x="318" y="220" textAnchor="middle">Thu</text>
-              <text x="394" y="220" textAnchor="middle">Fri</text>
-              <text x="470" y="220" textAnchor="middle">Sat</text>
-              <text x="546" y="220" textAnchor="middle">Sun</text>
+              {config.labels.map((label, i) => (
+                <text key={label} x={config.xPositions[i]} y="220" textAnchor="middle">
+                  {label}
+                </text>
+              ))}
             </g>
 
             {/* Confidence interval */}
@@ -44,23 +90,23 @@ export function ForecastChart() {
               opacity="0.5"
             />
 
-            {/* Actual demand */}
+            {/* Actual demand line */}
             <path
-              d="M90 105 L166 115 L242 95 L318 88"
+              d={actualPath}
               fill="none"
               stroke="oklch(22% 0.02 240)"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-            <circle cx="90" cy="105" r="4" fill="oklch(22% 0.02 240)"/>
-            <circle cx="166" cy="115" r="4" fill="oklch(22% 0.02 240)"/>
-            <circle cx="242" cy="95" r="4" fill="oklch(22% 0.02 240)"/>
-            <circle cx="318" cy="88" r="4" fill="oklch(22% 0.02 240)"/>
+            {/* Actual demand points */}
+            {chartData.actual.map((point, i) => (
+              <circle key={`actual-${i}`} cx={point.x} cy={point.y} r="4" fill="oklch(22% 0.02 240)"/>
+            ))}
 
-            {/* LSTM prediction */}
+            {/* LSTM prediction line */}
             <path
-              d="M318 88 L394 78 L470 92 L546 82"
+              d={lstmPath}
               fill="none"
               stroke="oklch(58% 0.16 145)"
               strokeWidth="2.5"
@@ -68,32 +114,37 @@ export function ForecastChart() {
               strokeLinejoin="round"
               strokeDasharray="8 4"
             />
-            <circle cx="394" cy="78" r="4" fill="oklch(58% 0.16 145)"/>
-            <circle cx="470" cy="92" r="4" fill="oklch(58% 0.16 145)"/>
-            <circle cx="546" cy="82" r="4" fill="oklch(58% 0.16 145)"/>
+            {/* LSTM prediction points */}
+            {chartData.lstm.slice(1).map((point, i) => (
+              <circle key={`lstm-${i}`} cx={point.x} cy={point.y} r="4" fill="oklch(58% 0.16 145)"/>
+            ))}
 
-            {/* ARIMA prediction */}
-            <path
-              d="M318 88 L394 85 L470 98 L546 90"
-              fill="none"
-              stroke="oklch(65% 0.15 250)"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeDasharray="4 4"
-              opacity="0.7"
+            {/* Today/Current marker */}
+            <line
+              x1={config.todayPosition}
+              y1="20"
+              x2={config.todayPosition}
+              y2="200"
+              stroke="oklch(58% 0.16 145)"
+              strokeWidth="1"
+              strokeDasharray="4 2"
             />
-
-            {/* Today marker */}
-            <line x1="318" y1="20" x2="318" y2="200" stroke="oklch(58% 0.16 145)" strokeWidth="1" strokeDasharray="4 2"/>
-            <text x="318" y="12" fill="oklch(58% 0.16 145)" fontSize="9" textAnchor="middle" fontWeight="600">TODAY</text>
+            <text
+              x={config.todayPosition}
+              y="12"
+              fill="oklch(58% 0.16 145)"
+              fontSize="9"
+              textAnchor="middle"
+              fontWeight="600"
+            >
+              {config.todayLabel}
+            </text>
           </svg>
         </div>
       </CardBody>
       <div className="chart-legend">
         <div className="legend-item"><span className="legend-dot actual" /> Actual Demand</div>
         <div className="legend-item"><span className="legend-dot lstm" /> LSTM Forecast</div>
-        <div className="legend-item"><span className="legend-dot arima" /> ARIMA Forecast</div>
         <div className="legend-item"><span className="legend-dot confidence" /> 95% Confidence</div>
       </div>
     </Card>
