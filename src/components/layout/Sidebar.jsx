@@ -1,3 +1,4 @@
+import { NavLink } from 'react-router-dom'
 import './Sidebar.css'
 import {
   BoltIcon,
@@ -15,40 +16,40 @@ const navSections = [
   {
     label: 'Overview',
     items: [
-      { id: 'dashboard', icon: DashboardIcon, label: 'Dashboard' },
-      { id: 'forecasts', icon: ChartIcon, label: 'Forecasts' },
-      { id: 'historical', icon: ClockIcon, label: 'Historical Data' }
+      { path: '/dashboard', icon: DashboardIcon, label: 'Dashboard' },
+      { path: '/forecasts', icon: ChartIcon, label: 'Forecasts' },
+      { path: '/historical', icon: ClockIcon, label: 'Historical Data' }
     ]
   },
   {
     label: 'Analysis',
     items: [
-      { id: 'models', icon: LayersIcon, label: 'Model Comparison' },
-      { id: 'xai', icon: HelpIcon, label: 'Explainable AI' },
-      { id: 'weather', icon: SunIcon, label: 'Weather Impact' }
+      { path: '/models', icon: LayersIcon, label: 'Model Comparison' },
+      { path: '/xai', icon: HelpIcon, label: 'Explainable AI' },
+      { path: '/weather', icon: SunIcon, label: 'Weather Impact' }
     ]
   },
   {
     label: 'Settings',
     items: [
-      { id: 'data', icon: DatabaseIcon, label: 'Data Sources' },
-      { id: 'config', icon: SettingsIcon, label: 'Configuration' }
+      { path: '/data-sources', icon: DatabaseIcon, label: 'Data Sources' },
+      { path: '/configuration', icon: SettingsIcon, label: 'Configuration' }
     ]
   }
 ]
 
-export function Sidebar({ activeNav, onNavChange }) {
+export function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <div className="logo">
+        <NavLink to="/" className="logo">
           <div className="logo-icon">
             <BoltIcon />
           </div>
           <div className="logo-text">
             GridSense <span>AI</span>
           </div>
-        </div>
+        </NavLink>
       </div>
 
       <nav className="nav">
@@ -56,14 +57,16 @@ export function Sidebar({ activeNav, onNavChange }) {
           <div key={section.label} className="nav-section">
             <div className="nav-label">{section.label}</div>
             {section.items.map(item => (
-              <button
-                key={item.id}
-                className={`nav-item ${activeNav === item.id ? 'active' : ''}`}
-                onClick={() => onNavChange(item.id)}
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  `nav-item ${isActive ? 'active' : ''}`
+                }
               >
                 <item.icon />
                 {item.label}
-              </button>
+              </NavLink>
             ))}
           </div>
         ))}
