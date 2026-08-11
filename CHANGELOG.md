@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.1.0] - 2026-08-11
+
+### Added
+
+- `PROJECT_PROMPT.md` — Reusable prompt for AI continuation and project recreation
+- Production build verified (`dist/` output)
+- `node_modules/` properly configured with dev dependencies
+
+### Documentation
+
+- Project brief and design system documentation
+- Sample prompts for future AI sessions
+- Team credits and reference documents listing
+
+---
+
 ## [2.0.0] - 2026-08-10
 
 ### Changed
