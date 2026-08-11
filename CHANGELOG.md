@@ -4,6 +4,40 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.4.0] - 2026-08-12
+
+### Added
+
+- **Time Range Filter Functionality** — 24H, 7D, 30D, 90D buttons now change dashboard data
+- `TimeRangeContext` for global state management of selected time period
+- Dynamic metrics that update based on selected time range
+- Time-period specific forecast summaries and chart data
+- Context provider pattern for sharing filter state across components
+
+### Changed
+
+- Metrics data structure now includes time-segmented values
+- ForecastChart component dynamically renders based on selected period
+- API service supports time range parameter for data filtering
+
+---
+
+## [2.3.0] - 2026-08-11
+
+### Added
+
+- **JSON Data Layer** for backend integration preparation
+- 8 JSON data files: metrics, forecasts, models, historical, features, weather, dataSources, alerts
+- **API Service** (`src/services/api.js`) with sync and async data fetching
+- Architecture ready for easy conversion to real API endpoints
+
+### Changed
+
+- All page components now consume centralized data via API service
+- Removed hardcoded data from individual components
+
+---
+
 ## [2.2.0] - 2026-08-11
 
 ### Added

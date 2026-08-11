@@ -1,49 +1,198 @@
 {
-  "metrics": [
-    {
-      "id": "peak_demand",
-      "label": "Predicted Peak Demand",
-      "value": 4872,
-      "displayValue": "4,872",
-      "unit": "MW",
-      "change": 3.2,
-      "changeText": "+3.2% from last week",
-      "trend": "up",
-      "icon": "bolt"
-    },
-    {
-      "id": "current_load",
-      "label": "Current Load",
-      "value": 3641,
-      "displayValue": "3,641",
-      "unit": "MW",
-      "change": -1.8,
-      "changeText": "-1.8% from yesterday",
-      "trend": "down",
-      "icon": "clock"
-    },
-    {
-      "id": "model_accuracy",
-      "label": "Model Accuracy (MAPE)",
-      "value": 96.4,
-      "displayValue": "96.4",
-      "unit": "%",
-      "change": 0.8,
-      "changeText": "+0.8% improvement",
-      "trend": "up",
-      "icon": "check"
-    },
-    {
-      "id": "renewable_share",
-      "label": "Renewable Share",
-      "value": 34.7,
-      "displayValue": "34.7",
-      "unit": "%",
-      "change": 5.1,
-      "changeText": "+5.1% from last month",
-      "trend": "up",
-      "icon": "sun"
-    }
-  ],
-  "lastUpdated": "2026-08-11T10:30:00Z"
+  "24H": {
+    "metrics": [
+      {
+        "id": "peak_demand",
+        "label": "Predicted Peak Demand",
+        "value": 4215,
+        "displayValue": "4,215",
+        "unit": "MW",
+        "change": 1.8,
+        "changeText": "+1.8% from yesterday",
+        "trend": "up",
+        "icon": "bolt"
+      },
+      {
+        "id": "current_load",
+        "label": "Current Load",
+        "value": 3641,
+        "displayValue": "3,641",
+        "unit": "MW",
+        "change": -0.5,
+        "changeText": "-0.5% from last hour",
+        "trend": "down",
+        "icon": "clock"
+      },
+      {
+        "id": "model_accuracy",
+        "label": "Model Accuracy (MAPE)",
+        "value": 98.2,
+        "displayValue": "98.2",
+        "unit": "%",
+        "change": 0.3,
+        "changeText": "+0.3% improvement",
+        "trend": "up",
+        "icon": "check"
+      },
+      {
+        "id": "renewable_share",
+        "label": "Renewable Share",
+        "value": 32.4,
+        "displayValue": "32.4",
+        "unit": "%",
+        "change": 2.1,
+        "changeText": "+2.1% from yesterday",
+        "trend": "up",
+        "icon": "sun"
+      }
+    ],
+    "lastUpdated": "2026-08-11T10:30:00Z"
+  },
+  "7D": {
+    "metrics": [
+      {
+        "id": "peak_demand",
+        "label": "Predicted Peak Demand",
+        "value": 4872,
+        "displayValue": "4,872",
+        "unit": "MW",
+        "change": 3.2,
+        "changeText": "+3.2% from last week",
+        "trend": "up",
+        "icon": "bolt"
+      },
+      {
+        "id": "current_load",
+        "label": "Average Load",
+        "value": 3641,
+        "displayValue": "3,641",
+        "unit": "MW",
+        "change": -1.8,
+        "changeText": "-1.8% from last week",
+        "trend": "down",
+        "icon": "clock"
+      },
+      {
+        "id": "model_accuracy",
+        "label": "Model Accuracy (MAPE)",
+        "value": 96.4,
+        "displayValue": "96.4",
+        "unit": "%",
+        "change": 0.8,
+        "changeText": "+0.8% improvement",
+        "trend": "up",
+        "icon": "check"
+      },
+      {
+        "id": "renewable_share",
+        "label": "Renewable Share",
+        "value": 34.7,
+        "displayValue": "34.7",
+        "unit": "%",
+        "change": 5.1,
+        "changeText": "+5.1% from last week",
+        "trend": "up",
+        "icon": "sun"
+      }
+    ],
+    "lastUpdated": "2026-08-11T10:30:00Z"
+  },
+  "30D": {
+    "metrics": [
+      {
+        "id": "peak_demand",
+        "label": "Predicted Peak Demand",
+        "value": 5124,
+        "displayValue": "5,124",
+        "unit": "MW",
+        "change": 4.8,
+        "changeText": "+4.8% from last month",
+        "trend": "up",
+        "icon": "bolt"
+      },
+      {
+        "id": "current_load",
+        "label": "Average Load",
+        "value": 3756,
+        "displayValue": "3,756",
+        "unit": "MW",
+        "change": 2.3,
+        "changeText": "+2.3% from last month",
+        "trend": "up",
+        "icon": "clock"
+      },
+      {
+        "id": "model_accuracy",
+        "label": "Model Accuracy (MAPE)",
+        "value": 94.8,
+        "displayValue": "94.8",
+        "unit": "%",
+        "change": 1.2,
+        "changeText": "+1.2% improvement",
+        "trend": "up",
+        "icon": "check"
+      },
+      {
+        "id": "renewable_share",
+        "label": "Renewable Share",
+        "value": 36.2,
+        "displayValue": "36.2",
+        "unit": "%",
+        "change": 8.4,
+        "changeText": "+8.4% from last month",
+        "trend": "up",
+        "icon": "sun"
+      }
+    ],
+    "lastUpdated": "2026-08-11T10:30:00Z"
+  },
+  "90D": {
+    "metrics": [
+      {
+        "id": "peak_demand",
+        "label": "Predicted Peak Demand",
+        "value": 5456,
+        "displayValue": "5,456",
+        "unit": "MW",
+        "change": 7.2,
+        "changeText": "+7.2% from last quarter",
+        "trend": "up",
+        "icon": "bolt"
+      },
+      {
+        "id": "current_load",
+        "label": "Average Load",
+        "value": 3892,
+        "displayValue": "3,892",
+        "unit": "MW",
+        "change": 4.1,
+        "changeText": "+4.1% from last quarter",
+        "trend": "up",
+        "icon": "clock"
+      },
+      {
+        "id": "model_accuracy",
+        "label": "Model Accuracy (MAPE)",
+        "value": 92.1,
+        "displayValue": "92.1",
+        "unit": "%",
+        "change": 2.4,
+        "changeText": "+2.4% improvement",
+        "trend": "up",
+        "icon": "check"
+      },
+      {
+        "id": "renewable_share",
+        "label": "Renewable Share",
+        "value": 38.9,
+        "displayValue": "38.9",
+        "unit": "%",
+        "change": 12.6,
+        "changeText": "+12.6% from last quarter",
+        "trend": "up",
+        "icon": "sun"
+      }
+    ],
+    "lastUpdated": "2026-08-11T10:30:00Z"
+  }
 }

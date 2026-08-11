@@ -1,9 +1,14 @@
 import { Card, CardHeader, CardBody } from '../components/ui/Card'
 import { ForecastChart } from '../components/dashboard'
-import { forecasts } from '../services/api'
+import { useTimeRange } from '../context'
+import { getForecastsSync, getMethodology } from '../services/api'
 import './Pages.css'
 
 export function ForecastsPage() {
+  const { timeRange } = useTimeRange()
+  const forecasts = getForecastsSync(timeRange)
+  const methodology = getMethodology()
+
   return (
     <div className="content">
       <div className="page-header">
@@ -44,7 +49,7 @@ export function ForecastsPage() {
         <CardHeader title="Forecast Methodology" />
         <CardBody>
           <div className="methodology-grid">
-            {forecasts.methodology.map(item => (
+            {methodology.map(item => (
               <div key={item.title} className="methodology-item">
                 <h4>{item.title}</h4>
                 <p>{item.description}</p>

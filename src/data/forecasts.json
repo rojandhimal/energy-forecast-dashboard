@@ -1,61 +1,197 @@
 {
-  "summary": [
-    {
-      "period": "Next 24 Hours",
-      "peakDemand": 4215,
-      "peakDisplay": "4,215 MW",
-      "minDemand": 2890,
-      "minDisplay": "2,890 MW",
-      "confidence": 98
-    },
-    {
-      "period": "Next 7 Days",
-      "peakDemand": 4872,
-      "peakDisplay": "4,872 MW",
-      "minDemand": 2654,
-      "minDisplay": "2,654 MW",
-      "confidence": 95
-    },
-    {
-      "period": "Next 30 Days",
-      "peakDemand": 5124,
-      "peakDisplay": "5,124 MW",
-      "minDemand": 2412,
-      "minDisplay": "2,412 MW",
-      "confidence": 89
-    },
-    {
-      "period": "Next 90 Days",
-      "peakDemand": 5456,
-      "peakDisplay": "5,456 MW",
-      "minDemand": 2198,
-      "minDisplay": "2,198 MW",
-      "confidence": 82
+  "24H": {
+    "summary": [
+      {
+        "period": "Next 6 Hours",
+        "peakDemand": 3890,
+        "peakDisplay": "3,890 MW",
+        "minDemand": 3420,
+        "minDisplay": "3,420 MW",
+        "confidence": 99
+      },
+      {
+        "period": "Next 12 Hours",
+        "peakDemand": 4125,
+        "peakDisplay": "4,125 MW",
+        "minDemand": 3180,
+        "minDisplay": "3,180 MW",
+        "confidence": 98
+      },
+      {
+        "period": "Next 18 Hours",
+        "peakDemand": 4180,
+        "peakDisplay": "4,180 MW",
+        "minDemand": 2950,
+        "minDisplay": "2,950 MW",
+        "confidence": 97
+      },
+      {
+        "period": "Next 24 Hours",
+        "peakDemand": 4215,
+        "peakDisplay": "4,215 MW",
+        "minDemand": 2890,
+        "minDisplay": "2,890 MW",
+        "confidence": 96
+      }
+    ],
+    "chartData": {
+      "labels": ["6H", "12H", "18H", "24H"],
+      "actual": [
+        { "label": "Now", "value": 3641, "x": 90, "y": 110 },
+        { "label": "+3H", "value": 3720, "x": 200, "y": 100 }
+      ],
+      "lstm": [
+        { "label": "+3H", "value": 3720, "x": 200, "y": 100 },
+        { "label": "+6H", "value": 3890, "x": 310, "y": 85 },
+        { "label": "+12H", "value": 4125, "x": 420, "y": 65 },
+        { "label": "+24H", "value": 4215, "x": 530, "y": 58 }
+      ]
     }
-  ],
-  "chartData": {
-    "labels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    "actual": [
-      { "day": "Mon", "value": 3800, "x": 90, "y": 105 },
-      { "day": "Tue", "value": 3700, "x": 166, "y": 115 },
-      { "day": "Wed", "value": 3900, "x": 242, "y": 95 },
-      { "day": "Thu", "value": 3950, "x": 318, "y": 88 }
+  },
+  "7D": {
+    "summary": [
+      {
+        "period": "Next 24 Hours",
+        "peakDemand": 4215,
+        "peakDisplay": "4,215 MW",
+        "minDemand": 2890,
+        "minDisplay": "2,890 MW",
+        "confidence": 98
+      },
+      {
+        "period": "Next 3 Days",
+        "peakDemand": 4560,
+        "peakDisplay": "4,560 MW",
+        "minDemand": 2720,
+        "minDisplay": "2,720 MW",
+        "confidence": 96
+      },
+      {
+        "period": "Next 5 Days",
+        "peakDemand": 4750,
+        "peakDisplay": "4,750 MW",
+        "minDemand": 2680,
+        "minDisplay": "2,680 MW",
+        "confidence": 94
+      },
+      {
+        "period": "Next 7 Days",
+        "peakDemand": 4872,
+        "peakDisplay": "4,872 MW",
+        "minDemand": 2654,
+        "minDisplay": "2,654 MW",
+        "confidence": 92
+      }
     ],
-    "lstm": [
-      { "day": "Thu", "value": 3950, "x": 318, "y": 88 },
-      { "day": "Fri", "value": 4100, "x": 394, "y": 78 },
-      { "day": "Sat", "value": 3850, "x": 470, "y": 92 },
-      { "day": "Sun", "value": 4000, "x": 546, "y": 82 }
+    "chartData": {
+      "labels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "actual": [
+        { "day": "Mon", "value": 3800, "x": 90, "y": 105 },
+        { "day": "Tue", "value": 3700, "x": 166, "y": 115 },
+        { "day": "Wed", "value": 3900, "x": 242, "y": 95 },
+        { "day": "Thu", "value": 3950, "x": 318, "y": 88 }
+      ],
+      "lstm": [
+        { "day": "Thu", "value": 3950, "x": 318, "y": 88 },
+        { "day": "Fri", "value": 4100, "x": 394, "y": 78 },
+        { "day": "Sat", "value": 3850, "x": 470, "y": 92 },
+        { "day": "Sun", "value": 4000, "x": 546, "y": 82 }
+      ]
+    }
+  },
+  "30D": {
+    "summary": [
+      {
+        "period": "Week 1",
+        "peakDemand": 4872,
+        "peakDisplay": "4,872 MW",
+        "minDemand": 2654,
+        "minDisplay": "2,654 MW",
+        "confidence": 95
+      },
+      {
+        "period": "Week 2",
+        "peakDemand": 4950,
+        "peakDisplay": "4,950 MW",
+        "minDemand": 2580,
+        "minDisplay": "2,580 MW",
+        "confidence": 91
+      },
+      {
+        "period": "Week 3",
+        "peakDemand": 5050,
+        "peakDisplay": "5,050 MW",
+        "minDemand": 2490,
+        "minDisplay": "2,490 MW",
+        "confidence": 87
+      },
+      {
+        "period": "Week 4",
+        "peakDemand": 5124,
+        "peakDisplay": "5,124 MW",
+        "minDemand": 2412,
+        "minDisplay": "2,412 MW",
+        "confidence": 83
+      }
     ],
-    "arima": [
-      { "day": "Thu", "value": 3950, "x": 318, "y": 88 },
-      { "day": "Fri", "value": 4050, "x": 394, "y": 85 },
-      { "day": "Sat", "value": 3780, "x": 470, "y": 98 },
-      { "day": "Sun", "value": 3900, "x": 546, "y": 90 }
+    "chartData": {
+      "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+      "actual": [
+        { "week": "Current", "value": 3800, "x": 90, "y": 105 }
+      ],
+      "lstm": [
+        { "week": "Current", "value": 3800, "x": 90, "y": 105 },
+        { "week": "Week 2", "value": 4100, "x": 242, "y": 78 },
+        { "week": "Week 3", "value": 4350, "x": 394, "y": 58 },
+        { "week": "Week 4", "value": 4500, "x": 546, "y": 45 }
+      ]
+    }
+  },
+  "90D": {
+    "summary": [
+      {
+        "period": "Month 1",
+        "peakDemand": 5124,
+        "peakDisplay": "5,124 MW",
+        "minDemand": 2412,
+        "minDisplay": "2,412 MW",
+        "confidence": 89
+      },
+      {
+        "period": "Month 2",
+        "peakDemand": 5280,
+        "peakDisplay": "5,280 MW",
+        "minDemand": 2350,
+        "minDisplay": "2,350 MW",
+        "confidence": 84
+      },
+      {
+        "period": "Month 3",
+        "peakDemand": 5456,
+        "peakDisplay": "5,456 MW",
+        "minDemand": 2198,
+        "minDisplay": "2,198 MW",
+        "confidence": 79
+      },
+      {
+        "period": "Quarter End",
+        "peakDemand": 5520,
+        "peakDisplay": "5,520 MW",
+        "minDemand": 2150,
+        "minDisplay": "2,150 MW",
+        "confidence": 75
+      }
     ],
-    "confidenceInterval": {
-      "upper": "M90 85 L166 95 L242 80 L318 70 L394 60 L470 75 L546 65",
-      "lower": "L546 105 L470 115 L394 100 L318 110 L242 120 L166 135 L90 125"
+    "chartData": {
+      "labels": ["Month 1", "Month 2", "Month 3"],
+      "actual": [
+        { "month": "Current", "value": 3800, "x": 90, "y": 105 }
+      ],
+      "lstm": [
+        { "month": "Current", "value": 3800, "x": 90, "y": 105 },
+        { "month": "Month 2", "value": 4400, "x": 318, "y": 55 },
+        { "month": "Month 3", "value": 4800, "x": 546, "y": 25 }
+      ]
     }
   },
   "methodology": [

@@ -7,7 +7,8 @@ import {
   Alerts
 } from '../components/dashboard'
 import { BoltIcon, ClockIcon, CheckCircleIcon, SunIcon } from '../components/ui/Icons'
-import { metrics as metricsData } from '../services/api'
+import { useTimeRange } from '../context'
+import { getMetricsSync } from '../services/api'
 
 const iconMap = {
   bolt: <BoltIcon />,
@@ -16,16 +17,19 @@ const iconMap = {
   sun: <SunIcon />
 }
 
-const metrics = metricsData.metrics.map(m => ({
-  icon: iconMap[m.icon],
-  label: m.label,
-  value: m.displayValue,
-  unit: m.unit,
-  change: m.changeText,
-  trend: m.trend
-}))
-
 export function DashboardPage() {
+  const { timeRange } = useTimeRange()
+  const metricsData = getMetricsSync(timeRange)
+
+  const metrics = metricsData.metrics.map(m => ({
+    icon: iconMap[m.icon],
+    label: m.label,
+    value: m.displayValue,
+    unit: m.unit,
+    change: m.changeText,
+    trend: m.trend
+  }))
+
   return (
     <div className="content">
       {/* Key Metrics */}
