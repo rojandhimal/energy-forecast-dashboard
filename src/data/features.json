@@ -1,0 +1,69 @@
+{
+  "features": [
+    {
+      "id": "temperature",
+      "name": "Temperature",
+      "importance": 0.92,
+      "category": "Weather",
+      "direction": "positive",
+      "description": "Higher temps increase cooling demand",
+      "correlation": "+2.5% per °C above 25°C"
+    },
+    {
+      "id": "hour",
+      "name": "Hour of Day",
+      "importance": 0.84,
+      "category": "Temporal",
+      "direction": "cyclical",
+      "description": "Peak hours 14:00-18:00",
+      "correlation": "N/A"
+    },
+    {
+      "id": "day",
+      "name": "Day of Week",
+      "importance": 0.71,
+      "category": "Temporal",
+      "direction": "cyclical",
+      "description": "Weekdays higher than weekends",
+      "correlation": "N/A"
+    },
+    {
+      "id": "solar",
+      "name": "Solar Radiation",
+      "importance": 0.65,
+      "category": "Weather",
+      "direction": "negative",
+      "description": "Reduces net demand via solar generation",
+      "correlation": "-0.8% net demand per 100 W/m²"
+    },
+    {
+      "id": "wind",
+      "name": "Wind Speed",
+      "importance": 0.48,
+      "category": "Weather",
+      "direction": "negative",
+      "description": "Wind generation offsets demand",
+      "correlation": "-0.3% net demand per 5 km/h"
+    },
+    {
+      "id": "humidity",
+      "name": "Humidity",
+      "importance": 0.35,
+      "category": "Weather",
+      "direction": "positive",
+      "description": "Higher humidity increases AC usage",
+      "correlation": "+0.4% per 10% increase"
+    }
+  ],
+  "explainability": {
+    "method": "SHAP",
+    "fullName": "SHapley Additive exPlanations",
+    "benefits": [
+      "Builds trust with stakeholders",
+      "Identifies data quality issues",
+      "Validates domain knowledge",
+      "Supports regulatory compliance"
+    ]
+  },
+  "lastUpdated": "2026-08-11T10:30:00Z"
+}

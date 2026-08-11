@@ -1,13 +1,7 @@
 import { Card, CardHeader, CardBody } from '../components/ui/Card'
 import { ForecastChart } from '../components/dashboard'
+import { forecasts } from '../services/api'
 import './Pages.css'
-
-const forecastData = [
-  { period: 'Next 24 Hours', peak: '4,215 MW', low: '2,890 MW', confidence: '98%' },
-  { period: 'Next 7 Days', peak: '4,872 MW', low: '2,654 MW', confidence: '95%' },
-  { period: 'Next 30 Days', peak: '5,124 MW', low: '2,412 MW', confidence: '89%' },
-  { period: 'Next 90 Days', peak: '5,456 MW', low: '2,198 MW', confidence: '82%' }
-]
 
 export function ForecastsPage() {
   return (
@@ -32,12 +26,12 @@ export function ForecastsPage() {
                 </tr>
               </thead>
               <tbody>
-                {forecastData.map(row => (
+                {forecasts.summary.map(row => (
                   <tr key={row.period}>
                     <td>{row.period}</td>
-                    <td className="mono">{row.peak}</td>
-                    <td className="mono">{row.low}</td>
-                    <td className="mono">{row.confidence}</td>
+                    <td className="mono">{row.peakDisplay}</td>
+                    <td className="mono">{row.minDisplay}</td>
+                    <td className="mono">{row.confidence}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -50,22 +44,12 @@ export function ForecastsPage() {
         <CardHeader title="Forecast Methodology" />
         <CardBody>
           <div className="methodology-grid">
-            <div className="methodology-item">
-              <h4>LSTM Neural Network</h4>
-              <p>Primary model for capturing long-term temporal dependencies in energy consumption patterns.</p>
-            </div>
-            <div className="methodology-item">
-              <h4>Ensemble Approach</h4>
-              <p>Combines predictions from LSTM, Random Forest, and SARIMA for improved accuracy.</p>
-            </div>
-            <div className="methodology-item">
-              <h4>Weather Integration</h4>
-              <p>Real-time weather data feeds adjust predictions based on temperature and conditions.</p>
-            </div>
-            <div className="methodology-item">
-              <h4>Confidence Intervals</h4>
-              <p>95% confidence bands calculated using bootstrap resampling of historical errors.</p>
-            </div>
+            {forecasts.methodology.map(item => (
+              <div key={item.title} className="methodology-item">
+                <h4>{item.title}</h4>
+                <p>{item.description}</p>
+              </div>
+            ))}
           </div>
         </CardBody>
       </Card>
