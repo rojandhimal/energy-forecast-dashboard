@@ -1,0 +1,119 @@
+{
+  "sources": [
+    {
+      "id": "grid_scada",
+      "name": "Grid SCADA System",
+      "type": "Real-time",
+      "frequency": "Every 5 min",
+      "lastSync": "2 min ago",
+      "lastSyncTimestamp": "2026-08-11T10:28:00Z",
+      "status": "active",
+      "recordCount": 2600000,
+      "recordsDisplay": "2.6M"
+    },
+    {
+      "id": "weather_api",
+      "name": "Weather API (OpenWeather)",
+      "type": "External API",
+      "frequency": "Every 15 min",
+      "lastSync": "8 min ago",
+      "lastSyncTimestamp": "2026-08-11T10:22:00Z",
+      "status": "active",
+      "recordCount": 156000,
+      "recordsDisplay": "156K"
+    },
+    {
+      "id": "solar_telemetry",
+      "name": "Solar Farm Telemetry",
+      "type": "Real-time",
+      "frequency": "Every 1 min",
+      "lastSync": "45 sec ago",
+      "lastSyncTimestamp": "2026-08-11T10:29:15Z",
+      "status": "active",
+      "recordCount": 892000,
+      "recordsDisplay": "892K"
+    },
+    {
+      "id": "wind_telemetry",
+      "name": "Wind Farm Telemetry",
+      "type": "Real-time",
+      "frequency": "Every 1 min",
+      "lastSync": "32 sec ago",
+      "lastSyncTimestamp": "2026-08-11T10:29:28Z",
+      "status": "active",
+      "recordCount": 654000,
+      "recordsDisplay": "654K"
+    },
+    {
+      "id": "historical_archive",
+      "name": "Historical Archive",
+      "type": "Batch",
+      "frequency": "Daily",
+      "lastSync": "6 hours ago",
+      "lastSyncTimestamp": "2026-08-11T04:00:00Z",
+      "status": "active",
+      "recordCount": 45000000,
+      "recordsDisplay": "45M"
+    },
+    {
+      "id": "holiday_calendar",
+      "name": "Holiday Calendar",
+      "type": "Static",
+      "frequency": "Yearly",
+      "lastSync": "30 days ago",
+      "lastSyncTimestamp": "2026-07-12T00:00:00Z",
+      "status": "active",
+      "recordCount": 365,
+      "recordsDisplay": "365"
+    }
+  ],
+  "pipeline": {
+    "stages": [
+      {
+        "name": "Ingestion Pipeline",
+        "status": "healthy",
+        "statusText": "Healthy"
+      },
+      {
+        "name": "Data Validation",
+        "status": "healthy",
+        "statusText": "Passing"
+      },
+      {
+        "name": "Feature Engineering",
+        "status": "healthy",
+        "statusText": "Running"
+      },
+      {
+        "name": "Model Retraining",
+        "status": "pending",
+        "statusText": "Scheduled 02:00"
+      }
+    ]
+  },
+  "quality": {
+    "metrics": [
+      {
+        "name": "Completeness",
+        "value": 99.2,
+        "display": "99.2%"
+      },
+      {
+        "name": "Accuracy",
+        "value": 98.7,
+        "display": "98.7%"
+      },
+      {
+        "name": "Timeliness",
+        "value": 99.8,
+        "display": "99.8%"
+      },
+      {
+        "name": "Consistency",
+        "value": 97.4,
+        "display": "97.4%"
+      }
+    ]
+  },
+  "lastUpdated": "2026-08-11T10:30:00Z"
+}

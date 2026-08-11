@@ -1,22 +1,6 @@
 import { Card, CardHeader, CardBody } from '../components/ui/Card'
+import { historical } from '../services/api'
 import './Pages.css'
-
-const historicalStats = [
-  { label: 'Total Records', value: '2,628,000', desc: 'Hourly readings since 2021' },
-  { label: 'Peak Demand Ever', value: '5,892 MW', desc: 'August 14, 2025 at 14:00' },
-  { label: 'Lowest Demand', value: '1,847 MW', desc: 'January 1, 2024 at 04:00' },
-  { label: 'Average Daily', value: '3,456 MW', desc: 'Rolling 365-day average' }
-]
-
-const recentHistory = [
-  { date: '2026-08-10', avg: '3,641 MW', peak: '4,215 MW', renewable: '34.7%' },
-  { date: '2026-08-09', avg: '3,712 MW', peak: '4,356 MW', renewable: '32.1%' },
-  { date: '2026-08-08', avg: '3,589 MW', peak: '4,128 MW', renewable: '35.8%' },
-  { date: '2026-08-07', avg: '3,678 MW', peak: '4,289 MW', renewable: '31.4%' },
-  { date: '2026-08-06', avg: '3,534 MW', peak: '4,067 MW', renewable: '36.2%' },
-  { date: '2026-08-05', avg: '3,601 MW', peak: '4,198 MW', renewable: '33.9%' },
-  { date: '2026-08-04', avg: '3,445 MW', peak: '3,987 MW', renewable: '38.1%' }
-]
 
 export function HistoricalPage() {
   return (
@@ -27,13 +11,13 @@ export function HistoricalPage() {
       </div>
 
       <div className="grid grid-metrics" style={{ marginBottom: 16 }}>
-        {historicalStats.map(stat => (
-          <Card key={stat.label}>
+        {historical.stats.map(stat => (
+          <Card key={stat.id}>
             <CardBody>
               <div className="stat-card">
                 <div className="stat-label">{stat.label}</div>
-                <div className="stat-value">{stat.value}</div>
-                <div className="stat-desc">{stat.desc}</div>
+                <div className="stat-value">{stat.displayValue}</div>
+                <div className="stat-desc">{stat.description}</div>
               </div>
             </CardBody>
           </Card>
@@ -53,12 +37,12 @@ export function HistoricalPage() {
               </tr>
             </thead>
             <tbody>
-              {recentHistory.map(row => (
+              {historical.recentHistory.map(row => (
                 <tr key={row.date}>
                   <td>{row.date}</td>
-                  <td className="mono">{row.avg}</td>
-                  <td className="mono">{row.peak}</td>
-                  <td className="mono">{row.renewable}</td>
+                  <td className="mono">{row.avgDisplay}</td>
+                  <td className="mono">{row.peakDisplay}</td>
+                  <td className="mono">{row.renewablePercent}%</td>
                 </tr>
               ))}
             </tbody>

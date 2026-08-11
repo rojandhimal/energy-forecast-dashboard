@@ -1,0 +1,80 @@
+{
+  "summary": [
+    {
+      "period": "Next 24 Hours",
+      "peakDemand": 4215,
+      "peakDisplay": "4,215 MW",
+      "minDemand": 2890,
+      "minDisplay": "2,890 MW",
+      "confidence": 98
+    },
+    {
+      "period": "Next 7 Days",
+      "peakDemand": 4872,
+      "peakDisplay": "4,872 MW",
+      "minDemand": 2654,
+      "minDisplay": "2,654 MW",
+      "confidence": 95
+    },
+    {
+      "period": "Next 30 Days",
+      "peakDemand": 5124,
+      "peakDisplay": "5,124 MW",
+      "minDemand": 2412,
+      "minDisplay": "2,412 MW",
+      "confidence": 89
+    },
+    {
+      "period": "Next 90 Days",
+      "peakDemand": 5456,
+      "peakDisplay": "5,456 MW",
+      "minDemand": 2198,
+      "minDisplay": "2,198 MW",
+      "confidence": 82
+    }
+  ],
+  "chartData": {
+    "labels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "actual": [
+      { "day": "Mon", "value": 3800, "x": 90, "y": 105 },
+      { "day": "Tue", "value": 3700, "x": 166, "y": 115 },
+      { "day": "Wed", "value": 3900, "x": 242, "y": 95 },
+      { "day": "Thu", "value": 3950, "x": 318, "y": 88 }
+    ],
+    "lstm": [
+      { "day": "Thu", "value": 3950, "x": 318, "y": 88 },
+      { "day": "Fri", "value": 4100, "x": 394, "y": 78 },
+      { "day": "Sat", "value": 3850, "x": 470, "y": 92 },
+      { "day": "Sun", "value": 4000, "x": 546, "y": 82 }
+    ],
+    "arima": [
+      { "day": "Thu", "value": 3950, "x": 318, "y": 88 },
+      { "day": "Fri", "value": 4050, "x": 394, "y": 85 },
+      { "day": "Sat", "value": 3780, "x": 470, "y": 98 },
+      { "day": "Sun", "value": 3900, "x": 546, "y": 90 }
+    ],
+    "confidenceInterval": {
+      "upper": "M90 85 L166 95 L242 80 L318 70 L394 60 L470 75 L546 65",
+      "lower": "L546 105 L470 115 L394 100 L318 110 L242 120 L166 135 L90 125"
+    }
+  },
+  "methodology": [
+    {
+      "title": "LSTM Neural Network",
+      "description": "Primary model for capturing long-term temporal dependencies in energy consumption patterns."
+    },
+    {
+      "title": "Ensemble Approach",
+      "description": "Combines predictions from LSTM, Random Forest, and SARIMA for improved accuracy."
+    },
+    {
+      "title": "Weather Integration",
+      "description": "Real-time weather data feeds adjust predictions based on temperature and conditions."
+    },
+    {
+      "title": "Confidence Intervals",
+      "description": "95% confidence bands calculated using bootstrap resampling of historical errors."
+    }
+  ],
+  "lastUpdated": "2026-08-11T10:30:00Z"
+}

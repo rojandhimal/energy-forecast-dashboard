@@ -1,0 +1,139 @@
+{
+  "current": {
+    "temperature": 32,
+    "temperatureDisplay": "32°C",
+    "humidity": 65,
+    "windSpeed": 18,
+    "conditions": "Partly Cloudy",
+    "lastUpdated": "2026-08-11T10:30:00Z"
+  },
+  "forecast": [
+    {
+      "day": "Monday",
+      "dayShort": "Mon",
+      "temperature": 32,
+      "tempDisplay": "32°C",
+      "humidity": 65,
+      "humidityDisplay": "65%",
+      "windSpeed": 18,
+      "windDisplay": "18 km/h",
+      "demandImpact": 8.2,
+      "impactDisplay": "+8.2%"
+    },
+    {
+      "day": "Tuesday",
+      "dayShort": "Tue",
+      "temperature": 34,
+      "tempDisplay": "34°C",
+      "humidity": 58,
+      "humidityDisplay": "58%",
+      "windSpeed": 12,
+      "windDisplay": "12 km/h",
+      "demandImpact": 11.5,
+      "impactDisplay": "+11.5%"
+    },
+    {
+      "day": "Wednesday",
+      "dayShort": "Wed",
+      "temperature": 31,
+      "tempDisplay": "31°C",
+      "humidity": 62,
+      "humidityDisplay": "62%",
+      "windSpeed": 22,
+      "windDisplay": "22 km/h",
+      "demandImpact": 6.8,
+      "impactDisplay": "+6.8%"
+    },
+    {
+      "day": "Thursday",
+      "dayShort": "Thu",
+      "temperature": 29,
+      "tempDisplay": "29°C",
+      "humidity": 70,
+      "humidityDisplay": "70%",
+      "windSpeed": 15,
+      "windDisplay": "15 km/h",
+      "demandImpact": 4.2,
+      "impactDisplay": "+4.2%"
+    },
+    {
+      "day": "Friday",
+      "dayShort": "Fri",
+      "temperature": 33,
+      "tempDisplay": "33°C",
+      "humidity": 55,
+      "humidityDisplay": "55%",
+      "windSpeed": 8,
+      "windDisplay": "8 km/h",
+      "demandImpact": 9.7,
+      "impactDisplay": "+9.7%"
+    },
+    {
+      "day": "Saturday",
+      "dayShort": "Sat",
+      "temperature": 28,
+      "tempDisplay": "28°C",
+      "humidity": 68,
+      "humidityDisplay": "68%",
+      "windSpeed": 20,
+      "windDisplay": "20 km/h",
+      "demandImpact": 2.1,
+      "impactDisplay": "+2.1%"
+    },
+    {
+      "day": "Sunday",
+      "dayShort": "Sun",
+      "temperature": 27,
+      "tempDisplay": "27°C",
+      "humidity": 72,
+      "humidityDisplay": "72%",
+      "windSpeed": 25,
+      "windDisplay": "25 km/h",
+      "demandImpact": 0.8,
+      "impactDisplay": "+0.8%"
+    }
+  ],
+  "correlations": [
+    {
+      "factor": "Temperature",
+      "impact": "+2.5% per °C above 25°C",
+      "direction": "positive"
+    },
+    {
+      "factor": "Solar Generation",
+      "impact": "-0.8% net demand per 100 W/m²",
+      "direction": "negative"
+    },
+    {
+      "factor": "Wind Generation",
+      "impact": "-0.3% net demand per 5 km/h",
+      "direction": "negative"
+    },
+    {
+      "factor": "Humidity",
+      "impact": "+0.4% per 10% increase",
+      "direction": "positive"
+    }
+  ],
+  "renewables": {
+    "solar": {
+      "expected": 1245,
+      "display": "1,245 MW",
+      "change": 12,
+      "changeText": "+12% vs yesterday"
+    },
+    "wind": {
+      "expected": 892,
+      "display": "892 MW",
+      "change": 4,
+      "changeText": "+4% vs yesterday"
+    },
+    "total": {
+      "expected": 2137,
+      "display": "2,137 MW",
+      "percentOfDemand": 34.7,
+      "percentText": "34.7% of demand"
+    }
+  },
+  "lastUpdated": "2026-08-11T10:30:00Z"
+}

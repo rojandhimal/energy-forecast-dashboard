@@ -7,41 +7,23 @@ import {
   Alerts
 } from '../components/dashboard'
 import { BoltIcon, ClockIcon, CheckCircleIcon, SunIcon } from '../components/ui/Icons'
+import { metrics as metricsData } from '../services/api'
 
-const metrics = [
-  {
-    icon: <BoltIcon />,
-    label: 'Predicted Peak Demand',
-    value: '4,872',
-    unit: 'MW',
-    change: '+3.2% from last week',
-    trend: 'up'
-  },
-  {
-    icon: <ClockIcon />,
-    label: 'Current Load',
-    value: '3,641',
-    unit: 'MW',
-    change: '-1.8% from yesterday',
-    trend: 'down'
-  },
-  {
-    icon: <CheckCircleIcon />,
-    label: 'Model Accuracy (MAPE)',
-    value: '96.4',
-    unit: '%',
-    change: '+0.8% improvement',
-    trend: 'up'
-  },
-  {
-    icon: <SunIcon />,
-    label: 'Renewable Share',
-    value: '34.7',
-    unit: '%',
-    change: '+5.1% from last month',
-    trend: 'up'
-  }
-]
+const iconMap = {
+  bolt: <BoltIcon />,
+  clock: <ClockIcon />,
+  check: <CheckCircleIcon />,
+  sun: <SunIcon />
+}
+
+const metrics = metricsData.metrics.map(m => ({
+  icon: iconMap[m.icon],
+  label: m.label,
+  value: m.displayValue,
+  unit: m.unit,
+  change: m.changeText,
+  trend: m.trend
+}))
 
 export function DashboardPage() {
   return (

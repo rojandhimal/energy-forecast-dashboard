@@ -1,0 +1,49 @@
+{
+  "metrics": [
+    {
+      "id": "peak_demand",
+      "label": "Predicted Peak Demand",
+      "value": 4872,
+      "displayValue": "4,872",
+      "unit": "MW",
+      "change": 3.2,
+      "changeText": "+3.2% from last week",
+      "trend": "up",
+      "icon": "bolt"
+    },
+    {
+      "id": "current_load",
+      "label": "Current Load",
+      "value": 3641,
+      "displayValue": "3,641",
+      "unit": "MW",
+      "change": -1.8,
+      "changeText": "-1.8% from yesterday",
+      "trend": "down",
+      "icon": "clock"
+    },
+    {
+      "id": "model_accuracy",
+      "label": "Model Accuracy (MAPE)",
+      "value": 96.4,
+      "displayValue": "96.4",
+      "unit": "%",
+      "change": 0.8,
+      "changeText": "+0.8% improvement",
+      "trend": "up",
+      "icon": "check"
+    },
+    {
+      "id": "renewable_share",
+      "label": "Renewable Share",
+      "value": 34.7,
+      "displayValue": "34.7",
+      "unit": "%",
+      "change": 5.1,
+      "changeText": "+5.1% from last month",
+      "trend": "up",
+      "icon": "sun"
+    }
+  ],
+  "lastUpdated": "2026-08-11T10:30:00Z"
+}
