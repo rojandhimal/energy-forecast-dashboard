@@ -4,6 +4,47 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.2.0] - 2026-08-11
+
+### Added
+
+- **Multi-page Navigation** with React Router v7
+- **8 dedicated pages** for each menu item:
+  - `DashboardPage` — Overview with metrics, chart, and panels
+  - `ForecastsPage` — Detailed forecasting with methodology
+  - `HistoricalPage` — Historical data analysis and trends
+  - `ModelsPage` — Model comparison with specifications
+  - `XAIPage` — Explainable AI with SHAP visualization
+  - `WeatherPage` — Weather impact and renewable forecast
+  - `DataSourcesPage` — Data pipeline management
+  - `ConfigurationPage` — System settings with forms
+- Client-side routing with NavLink active states
+- Comprehensive page styles (`Pages.css`)
+
+### Changed
+
+- Sidebar now uses `NavLink` instead of button elements
+- Navigation highlights current page automatically
+- Logo links to dashboard home
+
+---
+
+## [2.1.0] - 2026-08-11
+
+### Added
+
+- `PROJECT_PROMPT.md` — Reusable prompt for AI continuation and project recreation
+- Production build verified (`dist/` output)
+- `node_modules/` properly configured with dev dependencies
+
+### Documentation
+
+- Project brief and design system documentation
+- Sample prompts for future AI sessions
+- Team credits and reference documents listing
+
+---
+
 ## [2.0.0] - 2026-08-10
 
 ### Changed
