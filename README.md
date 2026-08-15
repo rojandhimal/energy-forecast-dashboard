@@ -46,6 +46,12 @@ This project implements an Energy Demand Forecasting Dashboard that helps electr
 - **SVG Charts** — Native SVG for data visualization
 - **Responsive Design** — Desktop, tablet, mobile
 
+## Documentation
+
+- **[DATA_DOCUMENTATION.md](DATA_DOCUMENTATION.md)** — Complete data requirements, input variables, JSON schemas, and API specifications
+- **[PROJECT_PROMPT.md](PROJECT_PROMPT.md)** — AI prompt for project continuation
+- **[CHANGELOG.md](CHANGELOG.md)** — Version history and changes
+
 ## Project Structure
 
 ```
@@ -53,23 +59,29 @@ This project implements an Energy Demand Forecasting Dashboard that helps electr
 ├── src/
 │   ├── components/
 │   │   ├── ui/              # Reusable UI components
-│   │   │   ├── Card.jsx
-│   │   │   ├── Button.jsx
-│   │   │   ├── MetricCard.jsx
-│   │   │   └── Icons.jsx
-│   │   ├── layout/          # Layout components
-│   │   │   ├── Sidebar.jsx
-│   │   │   └── Header.jsx
+│   │   ├── layout/          # Layout components (Sidebar, Header)
 │   │   └── dashboard/       # Dashboard panels
-│   │       ├── ForecastChart.jsx
-│   │       ├── ModelComparison.jsx
-│   │       ├── FeatureImportance.jsx
-│   │       ├── WeatherImpact.jsx
-│   │       └── Alerts.jsx
+│   ├── pages/               # Page components (8 pages)
+│   ├── data/                # JSON data files
+│   │   ├── metrics.json     # KPI metrics by time range
+│   │   ├── forecasts.json   # Forecast data and charts
+│   │   ├── models.json      # ML model specifications
+│   │   ├── historical.json  # Historical consumption
+│   │   ├── features.json    # XAI feature importance
+│   │   ├── weather.json     # Weather and renewables
+│   │   ├── dataSources.json # Data pipeline status
+│   │   └── alerts.json      # System alerts
+│   ├── services/
+│   │   └── api.js           # API service layer
+│   ├── context/
+│   │   └── TimeRangeContext.jsx  # Time filter state
 │   ├── styles/
 │   │   └── index.css        # Global styles & tokens
-│   ├── App.jsx              # Main app component
+│   ├── App.jsx              # Main app with routing
 │   └── main.jsx             # Entry point
+├── DATA_DOCUMENTATION.md    # Data requirements & API specs
+├── PROJECT_PROMPT.md        # AI continuation prompt
+├── CHANGELOG.md             # Version history
 ├── energy-forecast-dashboard.html   # Static HTML version
 ├── package.json
 ├── vite.config.js
