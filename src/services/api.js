@@ -1,25 +1,21 @@
 /**
  * API Service Layer
  *
- * This service abstracts data fetching. Currently uses local JSON files,
- * but can be easily converted to real API calls by changing the fetch functions.
- *
- * To convert to real API:
- * 1. Replace JSON imports with fetch() calls
- * 2. Update BASE_URL to your API endpoint
- * 3. Add authentication headers if needed
+ * Connects to the FastAPI backend for real-time energy data.
+ * Falls back to local JSON files when backend is unavailable.
  */
 
-// Configuration - change this when connecting to real API
+// Configuration
 const config = {
-  useApi: false, // Set to true when backend is ready
-  baseUrl: '/api/v1',
+  useApi: true,  // Enable API mode
+  baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   }
 }
 
-// Import local JSON data (used when useApi is false)
+// Import local JSON data as fallback
 import metricsJson from '../data/metrics.json'
 import forecastsJson from '../data/forecasts.json'
 import modelsJson from '../data/models.json'
@@ -29,144 +25,131 @@ import weatherJson from '../data/weather.json'
 import dataSourcesJson from '../data/dataSources.json'
 import alertsJson from '../data/alerts.json'
 
-// Simulate API delay for development
-const simulateDelay = (data, delay = 0) => {
-  return new Promise(resolve => setTimeout(() => resolve(data), delay))
+/**
+ * Fetch with timeout and error handling
+ */
+async function fetchWithTimeout(url, options = {}) {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), config.timeout)
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: { ...config.headers, ...options.headers }
+    })
+
+    clearTimeout(timeoutId)
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    return response.json()
+  } catch (error) {
+    clearTimeout(timeoutId)
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout')
+    }
+    throw error
+  }
 }
 
-// Generic fetch wrapper for when using real API
-async function apiFetch(endpoint) {
+/**
+ * API fetch with automatic fallback to local data
+ */
+async function apiFetch(endpoint, fallbackData = null) {
   if (!config.useApi) {
-    throw new Error('API mode not enabled')
+    return fallbackData
   }
 
-  const response = await fetch(`${config.baseUrl}${endpoint}`, {
-    headers: config.headers
-  })
-
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status}`)
+  try {
+    const data = await fetchWithTimeout(`${config.baseUrl}${endpoint}`)
+    return data
+  } catch (error) {
+    console.warn(`API fetch failed for ${endpoint}:`, error.message)
+    console.info('Falling back to local data')
+    return fallbackData
   }
-
-  return response.json()
 }
 
-// Helper to get data by time range
+// Helper to get data by time range from local JSON
 function getByTimeRange(data, timeRange = '7D') {
-  // If data has time range keys, return the matching one
   if (data[timeRange]) {
     return data[timeRange]
   }
-  // Otherwise return as-is (for non-time-filtered data)
   return data
 }
 
-// API Functions - these can be called from components
+// ============================================
+// API Functions - Dashboard Data
+// ============================================
 
 export async function getMetrics(timeRange = '7D') {
-  if (config.useApi) {
-    return apiFetch(`/metrics?range=${timeRange}`)
-  }
-  return simulateDelay(getByTimeRange(metricsJson, timeRange))
+  const fallback = getByTimeRange(metricsJson, timeRange)
+  return apiFetch(`/metrics?range=${timeRange}`, fallback)
 }
 
 export async function getForecasts(timeRange = '7D') {
-  if (config.useApi) {
-    return apiFetch(`/forecasts?range=${timeRange}`)
-  }
-  const data = getByTimeRange(forecastsJson, timeRange)
-  return simulateDelay(data)
-}
-
-export async function getForecastSummary(timeRange = '7D') {
-  const data = await getForecasts(timeRange)
-  return data.summary
-}
-
-export async function getForecastChart(timeRange = '7D') {
-  const data = await getForecasts(timeRange)
-  return data.chartData
+  const fallback = getByTimeRange(forecastsJson, timeRange)
+  return apiFetch(`/forecasts?range=${timeRange}`, fallback)
 }
 
 export async function getModels() {
-  if (config.useApi) {
-    return apiFetch('/models')
-  }
-  return simulateDelay(modelsJson)
+  return apiFetch('/models', modelsJson)
 }
 
-export async function getModelById(id) {
-  const data = await getModels()
-  return data.models.find(m => m.id === id)
-}
-
-export async function getHistorical() {
-  if (config.useApi) {
-    return apiFetch('/historical')
-  }
-  return simulateDelay(historicalJson)
-}
-
-export async function getHistoricalStats() {
-  const data = await getHistorical()
-  return data.stats
-}
-
-export async function getRecentHistory() {
-  const data = await getHistorical()
-  return data.recentHistory
+export async function getHistorical(days = 7) {
+  return apiFetch(`/historical?days=${days}`, historicalJson)
 }
 
 export async function getFeatures() {
-  if (config.useApi) {
-    return apiFetch('/features')
-  }
-  return simulateDelay(featuresJson)
+  return apiFetch('/features', featuresJson)
 }
 
 export async function getWeather() {
-  if (config.useApi) {
-    return apiFetch('/weather')
-  }
-  return simulateDelay(weatherJson)
-}
-
-export async function getWeatherForecast() {
-  const data = await getWeather()
-  return data.forecast
-}
-
-export async function getRenewables() {
-  const data = await getWeather()
-  return data.renewables
+  return apiFetch('/weather', weatherJson)
 }
 
 export async function getDataSources() {
-  if (config.useApi) {
-    return apiFetch('/data-sources')
-  }
-  return simulateDelay(dataSourcesJson)
-}
-
-export async function getPipelineStatus() {
-  const data = await getDataSources()
-  return data.pipeline
-}
-
-export async function getDataQuality() {
-  const data = await getDataSources()
-  return data.quality
+  return apiFetch('/data-sources', dataSourcesJson)
 }
 
 export async function getAlerts() {
-  if (config.useApi) {
-    return apiFetch('/alerts')
-  }
-  return simulateDelay(alertsJson)
+  return apiFetch('/alerts', alertsJson)
 }
 
-// Sync versions for components that don't need async
-// These directly return the imported JSON data with time range support
+export async function getHealth() {
+  return apiFetch('/health', { status: 'unknown' })
+}
+
+// ============================================
+// Scheduler Control Endpoints
+// ============================================
+
+export async function getSchedulerStatus() {
+  return apiFetch('/scheduler/status', { isRunning: false, jobs: [] })
+}
+
+export async function startScheduler() {
+  return fetchWithTimeout(`${config.baseUrl}/scheduler/start`, { method: 'POST' })
+}
+
+export async function stopScheduler() {
+  return fetchWithTimeout(`${config.baseUrl}/scheduler/stop`, { method: 'POST' })
+}
+
+export async function runJob(jobId) {
+  return fetchWithTimeout(`${config.baseUrl}/scheduler/run/${jobId}`, { method: 'POST' })
+}
+
+export async function retrainModels() {
+  return fetchWithTimeout(`${config.baseUrl}/models/retrain`, { method: 'POST' })
+}
+
+// ============================================
+// Sync versions for SSR/initial render
+// ============================================
 
 export function getMetricsSync(timeRange = '7D') {
   return getByTimeRange(metricsJson, timeRange)
@@ -180,7 +163,7 @@ export function getMethodology() {
   return forecastsJson.methodology
 }
 
-// Static data exports (not time-filtered)
+// Static exports for fallback
 export const models = modelsJson
 export const historical = historicalJson
 export const features = featuresJson
@@ -188,5 +171,30 @@ export const weather = weatherJson
 export const dataSources = dataSourcesJson
 export const alerts = alertsJson
 
-// Export config for testing/debugging
+// Export config
 export { config }
+
+// ============================================
+// API Status Check
+// ============================================
+
+let _apiAvailable = null
+
+export async function checkApiStatus() {
+  if (_apiAvailable !== null) return _apiAvailable
+
+  try {
+    await fetchWithTimeout(`${config.baseUrl}/health`)
+    _apiAvailable = true
+    console.info('Backend API connected:', config.baseUrl)
+  } catch {
+    _apiAvailable = false
+    console.warn('Backend API unavailable, using local data')
+  }
+
+  return _apiAvailable
+}
+
+export function isApiAvailable() {
+  return _apiAvailable
+}
