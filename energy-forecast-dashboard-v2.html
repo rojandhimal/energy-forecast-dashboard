@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GridSense AI — Smart Grid Forecast Console</title>
+  <style>
+    :root {
+      --bg: oklch(98% 0.005 250);
+      --surface: oklch(100% 0 0);
+      --fg: oklch(22% 0.02 240);
+      --muted: oklch(50% 0.018 240);
+      --border: oklch(90% 0.008 240);
+      --accent: oklch(58% 0.16 145);
+      --accent-soft: oklch(94% 0.045 145);
+      --success: oklch(58% 0.16 145);
+      --warn: oklch(74% 0.14 78);
+      --danger: oklch(58% 0.18 25);
+      --info: oklch(58% 0.12 245);
+      --shadow: 0 16px 42px oklch(22% 0.02 240 / 0.08);
+      --font-display: "IBM Plex Sans", "Aptos Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-body: "Inter", "Aptos", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select { font: inherit; }
+    button, a, input, select { min-height: 44px; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--info);
+      outline-offset: 2px;
+    }
+    .app {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--fg);
+      color: var(--surface);
+    }
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .brand-name span { display: block; color: var(--muted); font-size: 12px; font-weight: 450; }
+    .nav { flex: 1; padding: 14px 10px; overflow-y: auto; }
+    .nav-group { margin-bottom: 22px; }
+    .nav-label {
+      padding: 0 10px 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 10px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--fg);
+      text-align: left;
+      cursor: pointer;
+    }
+    .nav-item:hover { background: oklch(95% 0.006 250); }
+    .nav-item.active { background: var(--accent-soft); color: oklch(35% 0.13 145); font-weight: 600; }
+    .nav-item svg, .icon { width: 17px; height: 17px; flex: 0 0 auto; }
+    .sync-card {
+      margin: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: oklch(97% 0.006 250);
+    }
+    .sync-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
+    .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--success); }
+    .sync-meta { margin-top: 6px; color: var(--muted); font-size: 12px; }
+    .main { min-width: 0; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 24px;
+      background: oklch(100% 0 0 / 0.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+    }
+    .title-block h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 24px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .title-block p { margin: 3px 0 0; color: var(--muted); font-size: 13px; max-width: 74ch; }
+    .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .segmented {
+      display: flex;
+      padding: 3px;
+      gap: 2px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: oklch(96% 0.006 250);
+    }
+    .segment {
+      min-height: 36px;
+      padding: 7px 11px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .segment:hover { color: var(--fg); background: oklch(92% 0.007 250); }
+    .segment.active { background: var(--surface); color: var(--fg); box-shadow: 0 1px 3px oklch(22% 0.02 240 / 0.12); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 13px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--fg);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .btn:hover { background: oklch(94% 0.006 250); border-color: oklch(78% 0.012 245); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+    .btn-primary:hover { background: oklch(50% 0.16 145); border-color: oklch(50% 0.16 145); color: var(--surface); }
+    .content { padding: 20px 24px 28px; }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 1px 0 oklch(100% 0 0 / 0.8);
+    }
+    .metric { padding: 15px; }
+    .metric-label { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 550; }
+    .metric-value { margin-top: 8px; font-family: var(--font-mono); font-size: 27px; font-weight: 650; line-height: 1.05; letter-spacing: -0.02em; }
+    .metric-value span { margin-left: 4px; color: var(--muted); font-size: 13px; font-weight: 450; }
+    .metric-foot { margin-top: 8px; color: var(--muted); font-size: 12px; }
+    .metric-foot strong { color: var(--fg); font-weight: 650; }
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1.58fr) minmax(330px, 0.9fr);
+      gap: 14px;
+      align-items: start;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title { font-size: 13px; font-weight: 650; letter-spacing: -0.01em; }
+    .card-subtitle { color: var(--muted); font-size: 12px; }
+    .link {
+      min-height: 0;
+      color: var(--fg);
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .card-body { padding: 16px; }
+    .forecast-panel { display: grid; gap: 14px; }
+    .chart-wrap { height: 325px; }
+    .chart-wrap svg { width: 100%; height: 100%; display: block; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .swatch { width: 12px; height: 8px; border-radius: 2px; background: var(--fg); }
+    .swatch.forecast { background: var(--accent); }
+    .swatch.base { background: var(--info); }
+    .swatch.band { background: oklch(88% 0.05 145); }
+    .risk-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .risk-cell {
+      padding: 9px 8px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: oklch(97% 0.005 250);
+    }
+    .risk-cell strong { display: block; font-family: var(--font-mono); font-size: 14px; }
+    .risk-cell span { color: var(--muted); font-size: 11px; }
+    .risk-cell.warning { border-color: oklch(82% 0.09 78); background: oklch(97% 0.03 78); }
+    .side-stack { display: grid; gap: 14px; }
+    .scenario-form { display: grid; gap: 13px; }
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .field strong { color: var(--fg); font-family: var(--font-mono); font-weight: 650; }
+    input[type="range"] { width: 100%; accent-color: var(--fg); }
+    .select-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    select, input[type="number"] {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scenario-result {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding-top: 2px;
+    }
+    .result-box {
+      padding: 11px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: oklch(97% 0.006 250);
+    }
+    .result-box span { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+    .result-box strong { display: block; margin-top: 3px; font-family: var(--font-mono); font-size: 18px; }
+    .model-grid { display: grid; gap: 10px; }
+    .model-row {
+      display: grid;
+      grid-template-columns: 96px minmax(90px, 1fr) 72px;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 7px;
+      background: oklch(97% 0.005 250);
+    }
+    .model-name { font-weight: 650; font-size: 13px; }
+    .model-name span { display: block; color: var(--muted); font-size: 11px; font-weight: 450; }
+    .bar { height: 9px; overflow: hidden; border-radius: 99px; background: var(--border); }
+    .bar i { display: block; height: 100%; border-radius: inherit; background: var(--fg); }
+    .bar.secondary i { background: var(--info); }
+    .bar.warn i { background: var(--warn); }
+    .score { text-align: right; font-family: var(--font-mono); font-size: 12px; font-weight: 650; }
+    .section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .pipeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .pipe-step {
+      min-height: 92px;
+      padding: 11px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: oklch(97% 0.005 250);
+    }
+    .pipe-step .dot { margin-bottom: 11px; }
+    .pipe-step strong { display: block; font-size: 12px; line-height: 1.25; }
+    .pipe-step span { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; }
+    .pipe-step.pending .dot { background: var(--warn); }
+    .xai-list { display: grid; gap: 10px; }
+    .xai-item {
+      display: grid;
+      grid-template-columns: 118px 1fr 62px;
+      align-items: center;
+      gap: 10px;
+    }
+    .xai-name { font-size: 12px; font-weight: 600; }
+    .xai-bar { height: 18px; border-radius: 5px; background: oklch(96% 0.006 250); overflow: hidden; }
+    .xai-bar i { display: block; height: 100%; background: var(--info); border-radius: inherit; }
+    .xai-value { text-align: right; font-family: var(--font-mono); font-size: 12px; font-weight: 650; }
+    .alerts { display: grid; gap: 10px; }
+    .alert {
+      display: grid;
+      grid-template-columns: 9px 1fr auto;
+      gap: 10px;
+      align-items: start;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: oklch(97% 0.005 250);
+    }
+    .alert-marker { width: 9px; height: 44px; border-radius: 99px; background: var(--warn); }
+    .alert.info .alert-marker { background: var(--info); }
+    .alert.success .alert-marker { background: var(--success); }
+    .alert strong { display: block; font-size: 13px; }
+    .alert p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .alert time { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 20;
+      display: none;
+      max-width: 360px;
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      font-size: 13px;
+    }
+    .toast.show { display: block; }
+    .toast strong { display: block; margin-bottom: 2px; }
+
+    @media (max-width: 1180px) {
+      .app { grid-template-columns: 72px minmax(0, 1fr); }
+      .brand-name, .nav-label, .nav-item span, .sync-card { display: none; }
+      .brand { justify-content: center; padding-inline: 0; }
+      .nav-item { justify-content: center; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .workbench, .section-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .app { display: block; }
+      .sidebar { position: static; height: auto; flex-direction: row; overflow-x: auto; }
+      .brand { min-width: 68px; border-bottom: 0; border-right: 1px solid var(--border); }
+      .nav { display: flex; padding: 8px; }
+      .nav-group { display: flex; margin: 0; }
+      .topbar { position: static; align-items: flex-start; flex-direction: column; padding: 16px; }
+      .toolbar { justify-content: flex-start; width: 100%; }
+      .content { padding: 14px; }
+      .metrics, .risk-strip, .pipeline, .section-grid { grid-template-columns: 1fr; }
+      .select-row, .scenario-result { grid-template-columns: 1fr; }
+      .chart-wrap { height: 280px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" data-od-id="app-shell">
+    <aside class="sidebar" data-od-id="sidebar">
+      <div class="brand" data-od-id="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h8l-1 8 11-13h-8l1-7Z"/></svg>
+        </div>
+        <div class="brand-name">GridSense AI <span>Forecast console</span></div>
+      </div>
+      <nav class="nav" data-od-id="primary-navigation" aria-label="Primary">
+        <div class="nav-group">
+          <div class="nav-label">Operate</div>
+          <button class="nav-item active" data-od-id="nav-command"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Command view</span></button>
+          <button class="nav-item" data-od-id="nav-forecast"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="m4 15 5-5 4 4 7-8"/></svg><span>Forecasts</span></button>
+          <button class="nav-item" data-od-id="nav-feeders"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v18"/><path d="M18 3v18"/><path d="M6 8h12"/><path d="M6 16h12"/></svg><span>Feeder risk</span></button>
+        </div>
+        <div class="nav-group">
+          <div class="nav-label">Model</div>
+          <button class="nav-item" data-od-id="nav-models"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg><span>Comparison</span></button>
+          <button class="nav-item" data-od-id="nav-xai"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.7 2.7 0 0 1 5 1.4c0 1.8-2.5 2.1-2.5 3.6"/><path d="M12 17h.01"/></svg><span>Explainability</span></button>
+          <button class="nav-item" data-od-id="nav-sources"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>Data sources</span></button>
+        </div>
+      </nav>
+      <div class="sync-card" data-od-id="sync-status">
+        <div class="sync-title"><span class="dot"></span>Pipeline healthy</div>
+        <div class="sync-meta">SCADA 2 min ago · Weather 6 min ago · Solar 4 min ago</div>
+      </div>
+    </aside>
+
+    <main class="main" data-od-id="main-content">
+      <header class="topbar" data-od-id="topbar">
+        <div class="title-block" data-od-id="page-title">
+          <h1>Smart Grid Demand Forecast</h1>
+          <p>Operator console for future consumption, peak-risk windows, renewable contribution, and model evidence.</p>
+        </div>
+        <div class="toolbar" data-od-id="toolbar">
+          <div class="segmented" data-od-id="forecast-horizon" role="group" aria-label="Forecast horizon">
+            <button class="segment" data-range="24H">24H</button>
+            <button class="segment active" data-range="7D">7D</button>
+            <button class="segment" data-range="30D">30D</button>
+            <button class="segment" data-range="90D">90D</button>
+          </div>
+          <button class="btn" data-od-id="btn-export"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>Export</button>
+          <button class="btn btn-primary" data-od-id="btn-run-forecast"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8L7 4Z"/></svg>Run Forecast</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="metrics" data-od-id="metric-row" aria-label="Forecast metrics">
+          <article class="card metric" data-od-id="metric-peak"><div class="metric-label">Predicted peak</div><div class="metric-value" id="peakMetric">4,872<span>MW</span></div><div class="metric-foot"><strong>Fri 14:00-16:00</strong> · 95% band ±164 MW</div></article>
+          <article class="card metric" data-od-id="metric-load"><div class="metric-label">Current load</div><div class="metric-value">3,641<span>MW</span></div><div class="metric-foot"><strong>-1.8%</strong> versus yesterday same hour</div></article>
+          <article class="card metric" data-od-id="metric-mape"><div class="metric-label">Best model MAPE</div><div class="metric-value">3.6<span>%</span></div><div class="metric-foot"><strong>LSTM</strong> selected from 4 candidate models</div></article>
+          <article class="card metric" data-od-id="metric-renewable"><div class="metric-label">Renewable share</div><div class="metric-value">34.7<span>%</span></div><div class="metric-foot"><strong>+5.1%</strong> month trend from solar and wind</div></article>
+        </section>
+
+        <section class="workbench" data-od-id="operator-workbench">
+          <article class="card forecast-panel" data-od-id="forecast-card">
+            <div class="card-header">
+              <div><div class="card-title" id="chartTitle">7D Demand Forecast</div><div class="card-subtitle">Historical demand, LSTM forecast, ARIMA baseline, and confidence interval</div></div>
+              <button class="link" data-od-id="link-full-analysis">Full analysis</button>
+            </div>
+            <div class="card-body">
+              <div class="chart-wrap" data-od-id="forecast-chart">
+                <svg viewBox="0 0 760 310" role="img" aria-label="Demand forecast chart">
+                  <defs>
+                    <linearGradient id="confidenceFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="oklch(88% 0.05 145)" stop-opacity="0.78"/>
+                      <stop offset="100%" stop-color="oklch(88% 0.05 145)" stop-opacity="0.28"/>
+                    </linearGradient>
+                  </defs>
+                  <g stroke="oklch(91% 0.007 245)" stroke-width="1">
+                    <line x1="58" y1="30" x2="724" y2="30"/><line x1="58" y1="88" x2="724" y2="88"/><line x1="58" y1="146" x2="724" y2="146"/><line x1="58" y1="204" x2="724" y2="204"/><line x1="58" y1="262" x2="724" y2="262"/>
+                  </g>
+                  <g fill="oklch(50% 0.018 240)" font-family="JetBrains Mono, IBM Plex Mono, monospace" font-size="11">
+                    <text x="48" y="34" text-anchor="end">5000</text><text x="48" y="92" text-anchor="end">4500</text><text x="48" y="150" text-anchor="end">4000</text><text x="48" y="208" text-anchor="end">3500</text><text x="48" y="266" text-anchor="end">3000</text>
+                  </g>
+                  <path d="M82 132 C132 154 178 164 226 128 S320 104 368 116 S466 92 510 80 S610 124 684 94 L684 148 C612 174 562 154 510 142 S416 162 368 172 S274 184 226 178 S132 196 82 176 Z" fill="url(#confidenceFill)"/>
+                  <path d="M82 154 C132 166 178 174 226 148 S320 122 368 132" fill="none" stroke="oklch(22% 0.02 240)" stroke-width="3" stroke-linecap="round"/>
+                  <path d="M368 132 C420 110 468 96 510 96 S610 132 684 112" fill="none" stroke="oklch(58% 0.16 145)" stroke-width="3" stroke-linecap="round" stroke-dasharray="9 5"/>
+                  <path d="M368 132 C420 126 468 118 510 116 S610 146 684 132" fill="none" stroke="oklch(58% 0.12 245)" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 6"/>
+                  <line x1="368" y1="30" x2="368" y2="262" stroke="oklch(58% 0.16 145)" stroke-width="1.4" stroke-dasharray="4 4"/>
+                  <g fill="oklch(50% 0.018 240)" font-family="Inter, Aptos, sans-serif" font-size="11">
+                    <text x="82" y="292" text-anchor="middle">Mon</text><text x="178" y="292" text-anchor="middle">Tue</text><text x="274" y="292" text-anchor="middle">Wed</text><text x="368" y="292" text-anchor="middle">Now</text><text x="462" y="292" text-anchor="middle">Fri</text><text x="558" y="292" text-anchor="middle">Sat</text><text x="684" y="292" text-anchor="middle">Sun</text>
+                  </g>
+                  <g fill="oklch(22% 0.02 240)"><circle cx="82" cy="154" r="4"/><circle cx="178" cy="174" r="4"/><circle cx="274" cy="136" r="4"/><circle cx="368" cy="132" r="4"/></g>
+                  <g fill="oklch(58% 0.16 145)"><circle cx="462" cy="102" r="4"/><circle cx="558" cy="124" r="4"/><circle cx="684" cy="112" r="4"/></g>
+                </svg>
+              </div>
+              <div class="legend" data-od-id="chart-legend"><span><i class="swatch"></i>Actual demand</span><span><i class="swatch forecast"></i>LSTM forecast</span><span><i class="swatch base"></i>ARIMA baseline</span><span><i class="swatch band"></i>95% interval</span></div>
+              <div class="risk-strip" data-od-id="peak-risk-strip">
+                <div class="risk-cell"><strong>07:00</strong><span>Low ramp</span></div><div class="risk-cell"><strong>11:00</strong><span>Solar relief</span></div><div class="risk-cell warning"><strong>14:00</strong><span>Peak risk</span></div><div class="risk-cell warning"><strong>16:00</strong><span>Load shift</span></div><div class="risk-cell"><strong>21:00</strong><span>Stable</span></div>
+              </div>
+            </div>
+          </article>
+
+          <aside class="side-stack" data-od-id="right-rail">
+            <article class="card" data-od-id="scenario-lab">
+              <div class="card-header"><div><div class="card-title">Scenario Lab</div><div class="card-subtitle">Stress test weather and demand controls</div></div></div>
+              <div class="card-body">
+                <form class="scenario-form" data-od-id="scenario-form">
+                  <div class="field"><label for="temperature">Temperature uplift <strong id="tempValue">+3°C</strong></label><input id="temperature" data-od-id="input-temperature" type="range" min="-5" max="8" value="3"></div>
+                  <div class="field"><label for="solar">Solar availability <strong id="solarValue">82%</strong></label><input id="solar" data-od-id="input-solar" type="range" min="30" max="100" value="82"></div>
+                  <div class="select-row">
+                    <div class="field"><label for="model">Model</label><select id="model" data-od-id="select-model"><option>LSTM</option><option>Random Forest</option><option>SARIMA</option><option>ARIMA</option></select></div>
+                    <div class="field"><label for="reserve">Reserve margin</label><select id="reserve" data-od-id="select-reserve"><option>12%</option><option>10%</option><option>8%</option><option>6%</option></select></div>
+                  </div>
+                  <div class="scenario-result" data-od-id="scenario-result">
+                    <div class="result-box"><span>Peak delta</span><strong id="deltaResult">+114 MW</strong></div>
+                    <div class="result-box"><span>Dispatch note</span><strong id="dispatchResult">Shift 64 MW</strong></div>
+                  </div>
+                </form>
+              </div>
+            </article>
+
+            <article class="card" data-od-id="model-performance">
+              <div class="card-header"><div><div class="card-title">Model Performance</div><div class="card-subtitle">Lower MAE and RMSE are better</div></div></div>
+              <div class="card-body model-grid">
+                <div class="model-row" data-od-id="model-lstm"><div class="model-name">LSTM<span>Temporal</span></div><div class="bar"><i style="width:96%"></i></div><div class="score">MAE 142</div></div>
+                <div class="model-row" data-od-id="model-rf"><div class="model-name">Random Forest<span>Ensemble</span></div><div class="bar secondary"><i style="width:92%"></i></div><div class="score">MAE 198</div></div>
+                <div class="model-row" data-od-id="model-sarima"><div class="model-name">SARIMA<span>Seasonal</span></div><div class="bar secondary"><i style="width:89%"></i></div><div class="score">MAE 234</div></div>
+                <div class="model-row" data-od-id="model-arima"><div class="model-name">ARIMA<span>Baseline</span></div><div class="bar warn"><i style="width:86%"></i></div><div class="score">MAE 278</div></div>
+              </div>
+            </article>
+          </aside>
+        </section>
+
+        <section class="section-grid" data-od-id="analysis-grid">
+          <article class="card" data-od-id="data-pipeline">
+            <div class="card-header"><div><div class="card-title">Data Pipeline</div><div class="card-subtitle">Inputs used by feature engineering and retraining</div></div><button class="link" data-od-id="link-sources">Sources</button></div>
+            <div class="card-body pipeline">
+              <div class="pipe-step" data-od-id="pipe-scada"><span class="dot"></span><strong>SCADA demand</strong><span>5-min readings · 2.6M records</span></div>
+              <div class="pipe-step" data-od-id="pipe-weather"><span class="dot"></span><strong>Weather API</strong><span>Temperature, humidity, wind</span></div>
+              <div class="pipe-step" data-od-id="pipe-features"><span class="dot"></span><strong>Feature engineering</strong><span>Lag 1h, 24h, 7d, season</span></div>
+              <div class="pipe-step pending" data-od-id="pipe-retraining"><span class="dot"></span><strong>Retraining</strong><span>Scheduled after 30-day window</span></div>
+            </div>
+          </article>
+
+          <article class="card" data-od-id="xai-card">
+            <div class="card-header"><div><div class="card-title">Explainable AI</div><div class="card-subtitle">SHAP feature importance for selected forecast</div></div><button class="link" data-od-id="link-xai-report">Report</button></div>
+            <div class="card-body xai-list">
+              <div class="xai-item" data-od-id="xai-temperature"><div class="xai-name">Temperature</div><div class="xai-bar"><i style="width:92%"></i></div><div class="xai-value">0.92</div></div>
+              <div class="xai-item" data-od-id="xai-hour"><div class="xai-name">Hour of day</div><div class="xai-bar"><i style="width:84%"></i></div><div class="xai-value">0.84</div></div>
+              <div class="xai-item" data-od-id="xai-week"><div class="xai-name">Day of week</div><div class="xai-bar"><i style="width:71%"></i></div><div class="xai-value">0.71</div></div>
+              <div class="xai-item" data-od-id="xai-solar"><div class="xai-name">Solar radiation</div><div class="xai-bar"><i style="width:65%"></i></div><div class="xai-value">0.65</div></div>
+              <div class="xai-item" data-od-id="xai-wind"><div class="xai-name">Wind speed</div><div class="xai-bar"><i style="width:48%"></i></div><div class="xai-value">0.48</div></div>
+            </div>
+          </article>
+
+          <article class="card" data-od-id="operator-alerts">
+            <div class="card-header"><div><div class="card-title">Operational Alerts</div><div class="card-subtitle">Forecast-driven action queue</div></div><button class="link" data-od-id="link-alerts">View all</button></div>
+            <div class="card-body alerts">
+              <div class="alert" data-od-id="alert-peak"><span class="alert-marker"></span><div><strong>Peak demand warning</strong><p>Expected peak of 4,872 MW on Friday 14:00-16:00. Prepare load shifting.</p></div><time>2h ago</time></div>
+              <div class="alert info" data-od-id="alert-model"><span class="alert-marker"></span><div><strong>LSTM retrained</strong><p>Latest 30-day data lowered validation MAPE from 4.4% to 3.6%.</p></div><time>5h ago</time></div>
+              <div class="alert success" data-od-id="alert-renewable"><span class="alert-marker"></span><div><strong>Solar upside</strong><p>Solar generation is tracking 12% above forecast while stability remains normal.</p></div><time>1d ago</time></div>
+            </div>
+          </article>
+
+          <article class="card" data-od-id="weather-renewables">
+            <div class="card-header"><div><div class="card-title">Weather And Renewables</div><div class="card-subtitle">Inputs driving the next peak window</div></div></div>
+            <div class="card-body pipeline">
+              <div class="pipe-step" data-od-id="weather-temp"><span class="dot"></span><strong>32°C</strong><span>+8.2% cooling demand</span></div>
+              <div class="pipe-step" data-od-id="weather-wind"><span class="dot"></span><strong>18 km/h</strong><span>+4.1% wind generation</span></div>
+              <div class="pipe-step" data-od-id="weather-solar"><span class="dot"></span><strong>1,245 MW</strong><span>Solar expected today</span></div>
+              <div class="pipe-step pending" data-od-id="weather-humidity"><span class="dot"></span><strong>65%</strong><span>Humidity adds +2.4% demand</span></div>
+            </div>
+          </article>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" data-od-id="forecast-toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const rangeButtons = document.querySelectorAll(".segment");
+    const navButtons = document.querySelectorAll(".nav-item");
+    const chartTitle = document.getElementById("chartTitle");
+    const peakMetric = document.getElementById("peakMetric");
+    const temp = document.getElementById("temperature");
+    const solar = document.getElementById("solar");
+    const tempValue = document.getElementById("tempValue");
+    const solarValue = document.getElementById("solarValue");
+    const deltaResult = document.getElementById("deltaResult");
+    const dispatchResult = document.getElementById("dispatchResult");
+    const toast = document.getElementById("toast");
+
+    const ranges = {
+      "24H": { title: "24H Demand Forecast", peak: "4,215", band: "±96 MW" },
+      "7D": { title: "7D Demand Forecast", peak: "4,872", band: "±164 MW" },
+      "30D": { title: "30D Demand Forecast", peak: "5,028", band: "±221 MW" },
+      "90D": { title: "90D Demand Forecast", peak: "5,184", band: "±304 MW" }
+    };
+
+    function applyRange(range) {
+      rangeButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.range === range));
+      chartTitle.textContent = ranges[range].title;
+      peakMetric.innerHTML = `${ranges[range].peak}<span>MW</span>`;
+      localStorage.setItem("gridSenseForecastRange", range);
+    }
+
+    function updateScenario() {
+      const heat = Number(temp.value);
+      const sun = Number(solar.value);
+      const delta = Math.round(heat * 38 - (sun - 70) * 3.2);
+      tempValue.textContent = `${heat >= 0 ? "+" : ""}${heat}°C`;
+      solarValue.textContent = `${sun}%`;
+      deltaResult.textContent = `${delta >= 0 ? "+" : ""}${delta} MW`;
+      dispatchResult.textContent = delta > 80 ? `Shift ${Math.round(delta * 0.56)} MW` : "No shift";
+    }
+
+    function showToast(title, body) {
+      toast.innerHTML = `<strong>${title}</strong>${body}`;
+      toast.classList.add("show");
+      window.setTimeout(() => toast.classList.remove("show"), 3400);
+    }
+
+    rangeButtons.forEach(btn => btn.addEventListener("click", () => applyRange(btn.dataset.range)));
+    navButtons.forEach(btn => btn.addEventListener("click", () => {
+      navButtons.forEach(item => item.classList.remove("active"));
+      btn.classList.add("active");
+    }));
+    [temp, solar].forEach(input => input.addEventListener("input", updateScenario));
+    document.querySelector('[data-od-id="btn-run-forecast"]').addEventListener("click", () => {
+      updateScenario();
+      showToast("Forecast queued", "Scenario run submitted with current weather uplift, solar availability, and reserve margin.");
+    });
+    document.querySelector('[data-od-id="btn-export"]').addEventListener("click", () => {
+      showToast("Export prepared", "A forecast packet with chart, model metrics, XAI drivers, and alerts is ready.");
+    });
+
+    applyRange(localStorage.getItem("gridSenseForecastRange") || "7D");
+    updateScenario();
+  </script>
+</body>
+</html>

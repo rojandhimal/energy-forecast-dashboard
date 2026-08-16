@@ -103,6 +103,43 @@ npm run dev
 npm run build
 ```
 
+### Run Backend & Scheduler (local)
+
+The backend lives in the `backend/` folder. The data pipeline scheduler is started automatically when the backend app boots (see `app/main.py`), but you can also control it via the scheduler API endpoints.
+
+```bash
+# Change to backend and create an isolated environment
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Initialize the database and sample data (optional but recommended for first run)
+python scripts/init_data.py
+
+# Start the backend server (this will also start the scheduler automatically)
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Backend API base: http://localhost:8000
+
+Optional scheduler control (useful for manual testing):
+
+```bash
+# Start scheduler via API (if you prefer manual control)
+curl -X POST http://localhost:8000/api/v1/scheduler/start
+
+# Stop scheduler
+curl -X POST http://localhost:8000/api/v1/scheduler/stop
+
+# Trigger a job immediately (example)
+curl -X POST http://localhost:8000/api/v1/scheduler/run/fetch_energy_data
+```
+
+See `backend/README.md` for full backend and scheduler documentation.
+
 ### Static HTML Version
 
 Open `energy-forecast-dashboard.html` directly in a browser — no build required.
