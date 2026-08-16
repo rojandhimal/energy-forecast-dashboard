@@ -1,6 +1,7 @@
 import { MetricCard } from '../components/ui/MetricCard'
 import {
   ForecastChart,
+  ScenarioLab,
   ModelComparison,
   FeatureImportance,
   WeatherImpact,
@@ -42,7 +43,10 @@ export function DashboardPage() {
       {/* Main Chart & Model Comparison */}
       <div className="grid grid-main" style={{ marginBottom: 16 }}>
         <ForecastChart />
-        <ModelComparison />
+        <div className="dashboard-side-stack" data-od-id="dashboard-side-stack">
+          <ScenarioLab />
+          <ModelComparison />
+        </div>
       </div>
 
       {/* Bottom Row: XAI, Weather, Alerts */}

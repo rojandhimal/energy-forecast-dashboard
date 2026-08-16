@@ -1,0 +1,126 @@
+.scenario-lab {
+  min-width: 0;
+}
+
+.scenario-intro {
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.scenario-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.scenario-field,
+.scenario-select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.scenario-field span,
+.scenario-select span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.scenario-field strong {
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.scenario-field input[type="range"] {
+  width: 100%;
+  accent-color: var(--fg);
+}
+
+.scenario-select-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.scenario-select select {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 13px;
+}
+
+.scenario-select select:focus-visible,
+.scenario-field input[type="range"]:focus-visible {
+  outline: 2px solid oklch(58% 0.12 245);
+  outline-offset: 2px;
+}
+
+.scenario-results {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.scenario-result {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+.scenario-result span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.scenario-result strong {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.scenario-result.risk-high {
+  border-color: oklch(82% 0.08 25);
+  background: oklch(96% 0.035 25);
+}
+
+.scenario-result.risk-watch {
+  border-color: oklch(84% 0.1 85);
+  background: oklch(97% 0.035 85);
+}
+
+.dashboard-side-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .scenario-select-row,
+  .scenario-results {
+    grid-template-columns: 1fr;
+  }
+}

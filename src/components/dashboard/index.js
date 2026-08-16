@@ -1,4 +1,5 @@
 export * from './ForecastChart'
+export * from './ScenarioLab'
 export * from './ModelComparison'
 export * from './FeatureImportance'
 export * from './WeatherImpact'
