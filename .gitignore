@@ -29,3 +29,4 @@ build/
 .file-versions/
 .od-skills/
 *.artifact.json
+*.tar.gz
