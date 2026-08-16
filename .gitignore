@@ -30,3 +30,4 @@ build/
 .od-skills/
 *.artifact.json
 *.tar.gz
+venv/
